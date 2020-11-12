@@ -12,6 +12,18 @@
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
+
+    <script type="text/javascript">
+      (function (docs, win) {
+        const docEls = docs.documentElement,
+                recalcs = function () {
+                  //base on iphone 6/7/8, set rem value to 20
+                  window.rem = docEls.getBoundingClientRect().width / 18.75;
+                  docEls.style.fontSize = window.rem + 'px';
+                };
+        recalcs();
+      })(document, window);
+    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>
