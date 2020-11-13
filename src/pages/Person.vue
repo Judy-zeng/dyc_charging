@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="page-container">
         person
     </div>
 </template>

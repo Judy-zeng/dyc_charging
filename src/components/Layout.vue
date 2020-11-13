@@ -1,26 +1,17 @@
 <template>
-    <div class="weui-tab" ref="tab">
-        <div class="weui-tab__panel">
-            <router-view></router-view>
-<!--            <div class="weui-tab__content">反馈页</div>-->
-<!--            <div class="weui-tab__content">表单页</div>-->
-<!--            <div class="weui-tab__content">上传页</div>-->
-<!--            <div class="weui-tab__content">其它页</div>-->
-        </div>
-        <div class="weui-navbar">
-            <div :class="['weui-navbar__item', {'weui-bar__item_on': tab.path === $route.path}]"
-                 v-for="(tab, index) in tabList" :key="index" @click="handleChangeTab(tab.path)">
-                <img :src="require(`@/assets/images/${tab.icon}.png`)" alt="" class="weui-tabbar__icon">
-                <p class="weui-tabbar__label">{{tab.name}}</p>
-            </div>
-        </div>
+    <div class="layout-container">
+        <router-view></router-view>
+        <tabbar></tabbar>
     </div>
 </template>
 
 <script>
+    import Tabbar from '../components/Tabbar/Index'
     export default {
         name: 'Layout',
-        components: {},
+        components: {
+            Tabbar
+        },
         filters: {},
         props: {},
         data() {
