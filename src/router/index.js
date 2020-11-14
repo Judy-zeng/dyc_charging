@@ -9,6 +9,10 @@ import ChargeTiming from "@/pages/ChargeTiming";
 import ChargeInterface from "@/pages/ChargeInterface";
 import ChargeDetail from "@/pages/ChargeDetail";
 import AccountBalance from "@/pages/AccountBalance";
+import BalanceRecharge from "@/pages/BalanceRecharge";
+import BillRecord from "@/pages/BillRecord";
+import ChargeRecord from "@/pages/ChargeRecord";
+import DeviceRepair from "@/pages/DeviceRepair";
 
 Vue.use(Router)
 
@@ -53,6 +57,30 @@ const routes = [
         name: 'account-balance',
         meta: {title: '账户余额'},
         component: AccountBalance
+    },
+    {
+        path: '/balance-charge',
+        name: 'balance-charge',
+        meta: {title: '余额充值'},
+        component: BalanceRecharge
+    },
+    {
+        path: '/bill-record',
+        name: 'bill-record',
+        meta: {title: '账单记录'},
+        component: BillRecord
+    },
+    {
+        path: '/charge-record',
+        name: 'charge-record',
+        meta: {title: '充电记录'},
+        component: ChargeRecord
+    },
+    {
+        path: '/device-repair',
+        name: 'device-repair',
+        meta: {title: '设备报修'},
+        component: DeviceRepair
     },
     {
         path: '*',

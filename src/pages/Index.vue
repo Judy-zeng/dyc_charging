@@ -26,7 +26,7 @@
                 <img src="@/assets/images/icon-index-scan.png" alt="">
             </div>
             <div class="scan-qrcode-btn">
-                <button class="btn btn-plain">扫码充电</button>
+                <button class="btn btn-plain" @click="handleScanCode">扫码充电</button>
             </div>
         </div>
     </div>
@@ -88,7 +88,11 @@
         },
         mounted() {
         },
-        methods: {}
+        methods: {
+            handleScanCode() {
+                this.$router.push('/charge-timing')
+            }
+        }
     };
 </script>
 

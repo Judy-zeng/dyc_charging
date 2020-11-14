@@ -4,20 +4,37 @@
             <div class="account-balance-info">
                 <p class="total-money">428.88</p>
                 <p class="info-text"> 账户余额（元）</p>
-                <button class="info-btn">立即充值</button>
+                <button class="info-btn" @click="handleGoCharge">立即充值</button>
+            </div>
+
+            <div class="account-balance-list">
+                <div class="title">余额明细</div>
+
+                <div class="list-wrapper">
+                    <record-cell v-for="(item, index) in list" :item="item" :key="index"></record-cell>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+    import RecordCell from "@/components/List/RecordCell";
     export default {
         name: 'AccountBalance',
-        components: {},
+        components: {
+            RecordCell
+        },
         filters: {},
         props: {},
         data() {
-            return {};
+            return {
+                list: [
+                    {title: '订单退款', created_at: '2020-11-10 13:00:00', type: '微信支付', money: '2.00', status: 1},
+                    {title: '订单消费', created_at: '2020-11-10 13:00:00', type: '余额支付', money: '-2.00', status: 2},
+                    {title: '余额充值', created_at: '2020-11-10 13:00:00', type: '微信支付', money: '2.00', status: 3}
+                ]
+            };
         },
         computed: {},
         watch: {},
@@ -25,7 +42,11 @@
         },
         mounted() {
         },
-        methods: {}
+        methods: {
+            handleGoCharge () {
+                this.$router.push('/balance-charge')
+            }
+        }
     };
 </script>
 
@@ -50,8 +71,16 @@
             border: none;
             background-color: $theme-color;
             border-radius: 0.3rem;
-            width: 4.9rem;
+            padding: 0 0.5rem;
             height: 2rem;
+        }
+    }
+
+    .account-balance-list {
+        .title {
+            color: #212121;
+            font-size: 0.7rem;
+            margin-left: 0.6rem;
         }
     }
 }

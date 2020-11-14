@@ -15,7 +15,7 @@
                     <p class="money">￥50.00</p>
                     <p class="tip-text">账户余额</p>
                 </div>
-                <div class="user-section-charging-item">
+                <div class="user-section-charging-item" @click="handleGoPage('/balance-charge')">
                     <img class="charging-icon" src="@/assets/images/icon-person-charging.png" alt="">
                     <p class="tip-text">余额充值</p>
                 </div>
@@ -46,8 +46,8 @@
         data() {
             return {
                 list: [
-                    {icon: require('../assets/images/icon-person-history.png'), title: '历史账单', link: '/history-bill'},
-                    {icon: require('../assets/images/icon-person-record.png'), title: '充电记录', link: '/charging-record'},
+                    {icon: require('../assets/images/icon-person-history.png'), title: '历史账单', link: '/bill-record'},
+                    {icon: require('../assets/images/icon-person-record.png'), title: '充电记录', link: '/charge-record'},
                     {icon: require('../assets/images/icon-person-phone.png'), title: '客服电话', after: '051267898765'},
                 ]
             };
