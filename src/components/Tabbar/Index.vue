@@ -42,8 +42,9 @@
     z-index: 500;
     bottom: 0;
     width: 100%;
+    height: 3rem;
     background-color: #fff;
-    box-shadow: 0px 4px 16px 0px rgba(44, 44, 44, 0.5);
+    box-shadow: 0 0.2rem 0.6rem 0 rgba(44, 44, 44, 0.4);
     &:before{
         content: " ";
         position: absolute;

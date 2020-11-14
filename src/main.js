@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import FastClick from 'fastclick'
 
+import './router/permission'
+
 import '@/assets/style/common.css'
 import "@/assets/style/theme.scss";
 FastClick.attach(document.body)
