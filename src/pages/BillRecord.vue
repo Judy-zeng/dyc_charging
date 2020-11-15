@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="list-wrapper">
                 <record-cell v-for="(item, index) in list" :item="item" :key="index"></record-cell>
@@ -10,10 +11,13 @@
 
 <script>
     import RecordCell from "@/components/List/RecordCell";
+    import Header from "@/components/Header";
+
     export default {
         name: 'BillRecord',
         components: {
-            RecordCell
+            RecordCell,
+            'c-header': Header
         },
         filters: {},
         props: {},

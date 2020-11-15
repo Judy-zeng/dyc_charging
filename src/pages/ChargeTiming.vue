@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="banner-container">
                 <img src="@/assets/images/index-banner.png" alt="">
@@ -33,9 +34,12 @@
 </template>
 
 <script>
+    import Header from "@/components/Header";
     export default {
         name: 'ChargeTiming',
-        components: {},
+        components: {
+            'c-header': Header
+        },
         filters: {},
         props: {},
         data() {
@@ -104,7 +108,7 @@
             grid-template-columns: repeat(3, 1fr);
             margin: 0.9rem 0 0.5rem 0;
             .box-item {
-                border: solid 1px rgba(83, 83, 83, 0.69);
+                border: solid 1px rgba(83, 83, 83, 0.6);
                 box-sizing: border-box;
                 border-radius: 0.3rem;
                 text-align: center;
@@ -133,7 +137,7 @@
     }
 
     .charge-timing-btn {
-        padding: 1.5rem 0.7rem 0.6rem 0.7rem;
+        padding: 1.5rem 0.7rem 1rem 0.7rem;
         .charge-btn {
             width: 100%;
             height: 2rem;

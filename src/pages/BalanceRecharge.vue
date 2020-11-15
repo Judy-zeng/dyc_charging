@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="banner-container">
                 <img src="@/assets/images/index-banner.png" alt="">
@@ -34,9 +35,13 @@
 </template>
 
 <script>
+    import Header from "@/components/Header";
+
     export default {
         name: 'BalanceRecharge',
-        components: {},
+        components: {
+            'c-header': Header
+        },
         filters: {},
         props: {},
         data() {
@@ -46,9 +51,7 @@
                     { money: 50, tip: ''},
                     { money: 100, tip: '充100送1元'},
                     { money: 200, tip: '充100送1元'},
-                    { money: 500, tip: '充100送1元'},
-                    { money: 500, tip: '充100送1元'},
-                    { money: 500, tip: '充100送1元'},
+                    { money: 500, tip: '充100送1元'}
                 ]
             };
         },

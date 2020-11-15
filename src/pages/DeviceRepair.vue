@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="device-info">
                 <div class="device-info-icon">
@@ -41,9 +42,13 @@
 </template>
 
 <script>
+    import Header from "@/components/Header";
+
     export default {
         name: 'DeviceRepair',
-        components: {},
+        components: {
+            'c-header': Header
+        },
         filters: {},
         props: {},
         data() {
@@ -56,7 +61,9 @@
         mounted() {
         },
         methods: {
-            handleConfirm() {}
+            handleConfirm() {
+                this.$router.push('/index')
+            }
         }
     };
 </script>

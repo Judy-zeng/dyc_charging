@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <charge-cell v-for="(item, index) in list" :item="item" :key="index"></charge-cell>
         </div>
@@ -8,10 +9,13 @@
 
 <script>
     import ChargeCell from "@/components/List/ChargeCell";
+    import Header from "@/components/Header";
+
     export default {
         name: 'ChargeRecord',
         components: {
-            ChargeCell
+            ChargeCell,
+            'c-header': Header
         },
         filters: {},
         props: {},

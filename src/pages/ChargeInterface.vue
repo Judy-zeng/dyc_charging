@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="banner-container">
                 <img src="@/assets/images/index-banner.png" alt="">
@@ -10,7 +11,7 @@
                     <span>钱包余额</span>
                     <span class="total-money">180.00</span>
                 </div>
-                <div class="invest-btn">
+                <div class="invest-btn" @click="handleGoPay">
                     <span>去充值</span>
                 </div>
             </div>
@@ -69,13 +70,15 @@
     import 'swiper/dist/css/swiper.css'
 
     import Popup from "@/components/Popup";
+    import Header from "@/components/Header";
 
     export default {
         name: 'ChargeInterface',
         components: {
             swiper,
             swiperSlide,
-            Popup
+            Popup,
+            'c-header': Header
         },
         filters: {},
         props: {},
@@ -135,7 +138,9 @@
             },
             handlePayMode(item) {
                 this.$router.push('/charge-detail')
-                console.log(item)
+            },
+            handleGoPay() {
+                this.$router.push('/balance-charge')
             }
         }
     };
@@ -180,7 +185,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 2.1rem;
+            height: 2.5rem;
             padding: 0 0.5rem;
             position: relative;
             z-index: 1;

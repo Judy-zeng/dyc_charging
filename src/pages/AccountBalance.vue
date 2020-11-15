@@ -1,5 +1,6 @@
 <template>
     <div class="page-container">
+        <c-header></c-header>
         <div class="page-content">
             <div class="account-balance-info">
                 <p class="total-money">428.88</p>
@@ -20,10 +21,13 @@
 
 <script>
     import RecordCell from "@/components/List/RecordCell";
+    import Header from "@/components/Header";
+
     export default {
         name: 'AccountBalance',
         components: {
-            RecordCell
+            RecordCell,
+            'c-header': Header
         },
         filters: {},
         props: {},

@@ -109,7 +109,8 @@
         border-top-right-radius: 0.7rem;
         position: relative;
         top: -2rem;
-        height: 100%;
+        min-height: 6rem;
+        /*height: 100%;*/
         z-index: 1;
         padding: 0 1rem;
         .user-section-charging {

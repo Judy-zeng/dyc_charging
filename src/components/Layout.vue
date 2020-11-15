@@ -6,11 +6,11 @@
 </template>
 
 <script>
-    import Tabbar from '../components/Tabbar/Index'
+    import Tabbar from './Tabbar'
     export default {
         name: 'Layout',
         components: {
-            Tabbar
+            'tabbar': Tabbar
         },
         filters: {},
         props: {},
@@ -25,17 +25,9 @@
         },
         computed: {},
         watch: {},
-        created() {
-            console.log(this.$route.path)
-        },
-        mounted() {
-        },
-        methods: {
-            handleChangeTab(path) {
-                if (this.$route.path === path) return
-                this.$router.push(path)
-            }
-        }
+        created() {},
+        mounted() {},
+        methods: {}
     };
 </script>
 

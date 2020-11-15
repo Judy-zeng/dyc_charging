@@ -1,10 +1,14 @@
 import router from './index'
-import Cookie from 'js-cookie'
 
+let toURL = null
 router.beforeEach(async (to, from, next) => {
-    if (to.meta.title) document.title = to.meta.title
-    if (to.query.appId) {
-       Cookie.set('COURSE_APPID', to.query.appId)
-    }
+    // if (toURL === to.path) {
+    //     next()
+    // }
+    // if (to.path !== from.path) {
+    //     toURL = to.path
+    //     next({ ...to })
+    //     // next()
+    // }
     next()
 })
