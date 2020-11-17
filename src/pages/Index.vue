@@ -35,6 +35,9 @@
 <script>
     import {swiper, swiperSlide} from 'vue-awesome-swiper'
     import 'swiper/dist/css/swiper.css'
+
+    import wx from 'weixin-js-sdk'
+
     export default {
         name: 'Index',
         components: {
@@ -77,7 +80,7 @@
                         stretch: 0,
                         depth: 100,
                         modifier: 1,
-                        slideShadows : false
+                        slideShadows: false
                     }
                 }
             };
@@ -89,8 +92,46 @@
         mounted() {
         },
         methods: {
+            // 调用微信扫码
             handleScanCode() {
-                this.$router.push('/charge-timing')
+                this.$router.replace('/charge-timing?redirect=/index')
+                // wx.config({
+                //     debug: true,
+                //     appId: '',
+                //     timestamp: '',
+                //     nonceStr: '',
+                //     signature: '',
+                //     jsApiList: ['scanQRCode']
+                // })
+                // // let _this = this
+                // wx.ready(() => {
+                //     wx.checkJsApi({
+                //         jsApiList: ['scanQRCode'],
+                //         success: function (res) {
+                //             if (res.checkResult.scanQRCode === true) {
+                //                 wx.scanQRCode({
+                //                     desc: 'desc',
+                //                     needResult: 1,
+                //                     scanType: ['qrCode'],
+                //                     success(res) {
+                //                         let result = res.resultStr
+                //                         console.log(result)
+                //                         this.$router.push('/charge-timing')
+                //                     }
+                //                 })
+                //             } else {
+                //                 console.log('客服端不支持扫一扫')
+                //             }
+                //         },
+                //         fail: function (res) {
+                //             console.log(res)
+                //         }
+                //     })
+                //
+                //     wx.error(res => {
+                //         console.log(res.errMsg)
+                //     })
+                // })
             }
         }
     };
@@ -117,6 +158,7 @@
     .swiper-banner-container {
         width: 100%;
         height: 7.5rem;
+
         .swiper-slide {
             text-align: center;
             background: #fff;
@@ -134,6 +176,7 @@
             -ms-flex-align: center;
             -webkit-align-items: center;
             align-items: center;
+
             img {
                 width: 100%;
             }
@@ -144,9 +187,11 @@
         width: 100%;
         height: 6.5rem;
         margin: 2rem 0;
+
         .swiper-container {
             height: 100%;
         }
+
         .swiper-slide {
             display: flex;
             justify-content: center;
@@ -156,6 +201,7 @@
             height: 100%;
             background-position: center;
             background-size: cover;
+
             img {
                 width: 100%;
                 height: 100%;
@@ -166,17 +212,21 @@
     .scan-qrcode-container {
         text-align: center;
         margin: 3rem 0;
+
         .scan-qrcode-img {
             width: 4.5rem;
             height: 4.5rem;
             margin: auto;
+
             img {
                 width: 100%;
             }
         }
+
         .scan-qrcode-btn {
             width: 4.5rem;
             margin: 0.7rem auto;
+
             .btn {
                 width: 100%;
                 outline: none;
@@ -185,6 +235,7 @@
                 background-color: $button-primary-color;
                 font-size: 0.8rem;
                 padding: .5rem 0;
+
                 &.btn-plain {
                     background-color: #fff;
                     color: $button-primary-color;

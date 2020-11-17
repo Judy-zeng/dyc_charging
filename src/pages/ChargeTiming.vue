@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <c-header></c-header>
+        <c-header @goback="handleGoBack"></c-header>
         <div class="page-content">
             <div class="banner-container">
                 <img src="@/assets/images/index-banner.png" alt="">
@@ -70,7 +70,10 @@
                 this.currentList = item
             },
             handleNextStep () {
-                this.$router.push('/charge-interface')
+                this.$router.replace('/charge-interface?redirect=/charge-timing')
+            },
+            handleGoBack () {
+                this.$router.replace('/index')
             }
         }
     };

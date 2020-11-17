@@ -69,7 +69,7 @@
                 this.list.push({title: '结束时间', field: 'finished_at', finished_at: '2020-11-09  13:00:00'})
             },
             handleDeviceRepair() {
-                this.$router.push('/device-repair')
+                this.$router.replace({path: '/device-repair', query: {redirect: '/index'}})
             }
         }
     };

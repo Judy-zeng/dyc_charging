@@ -2,7 +2,7 @@
     <div class="tabbar-wrapper">
         <router-link v-for="(item, index) in tabList"
                      :key="index" :to="item.path"
-                     class="tabbar-item">
+                     class="tabbar-item" replace>
             <div class="tabbar-icon">
                 <img v-if="$route.path.includes(item.path)"
                      :src="require(`@/assets/images/${item.icon}-selected.png`)" alt="">

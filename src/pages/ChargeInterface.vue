@@ -71,6 +71,7 @@
 
     import Popup from "@/components/Popup";
     import Header from "@/components/Header";
+    import wx from "weixin-js-sdk";
 
     export default {
         name: 'ChargeInterface',
@@ -136,11 +137,56 @@
             handleShowPay() {
                 this.$refs.payPopup.showModal()
             },
+            // 发起支付
             handlePayMode(item) {
-                this.$router.push('/charge-detail')
+                if (item === '微信支付') {
+                    this.getWxConfigSign()
+                } else {
+                    console.log(item)
+                }
+                this.$router.replace({
+                    path: '/charge-detail', query: {
+                        redirect: '/index'
+                    }
+                })
             },
+            // 去充值
             handleGoPay() {
-                this.$router.push('/balance-charge')
+                this.$router.replace({path: '/balance-charge', query: {
+                    redirect: '/charge-interface'
+                    }})
+            },
+            getWxConfigSign() {
+                // let url = location.href
+                wx.config({
+                    debug: true,
+                    appId: '',
+                    timestamp: '',
+                    nonceStr: '',
+                    signature: '',
+                    jsApiList: ['chooseWXPay']
+                })
+
+                wx.ready(() => {
+                    wx.chooseWXPay({
+                        timestamp: 0,
+                        nonceStr: '',
+                        package: '', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                        signType: '', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                        paySign: '', // 支付签名
+                        success: function (res) {
+                            console.log(res)
+                            // 支付成功后的回调函数
+                        },
+                        fail: function (err) {
+                            console.log(err.errMsg)
+                        }
+                    })
+
+                    wx.error(res => {
+                        console.log(res.errMsg)
+                    })
+                })
             }
         }
     };

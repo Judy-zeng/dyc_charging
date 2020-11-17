@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <c-header></c-header>
+        <c-header @goback="handleGoBack"></c-header>
         <div class="page-content">
             <div class="account-balance-info">
                 <p class="total-money">428.88</p>
@@ -48,7 +48,10 @@
         },
         methods: {
             handleGoCharge () {
-                this.$router.push('/balance-charge')
+                this.$router.replace({path: '/balance-charge', query: {redirect: '/account-balance'}})
+            },
+            handleGoBack () {
+                this.$router.replace('/person')
             }
         }
     };

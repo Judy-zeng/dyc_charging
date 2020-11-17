@@ -62,7 +62,7 @@
         },
         methods: {
             handleConfirm() {
-                this.$router.push('/index')
+                this.$router.replace('/index')
             }
         }
     };

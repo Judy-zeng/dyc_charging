@@ -37,7 +37,7 @@
                 if (this.redirect) {
                     this.$router.replace(this.redirect)
                 } else {
-                    this.$router.go(-1)
+                    this.$emit('goback')
                 }
             }
         }
