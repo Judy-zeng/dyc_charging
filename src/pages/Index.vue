@@ -94,7 +94,7 @@
         methods: {
             // 调用微信扫码
             handleScanCode() {
-                this.$router.replace('/charge-timing?redirect=/index')
+                this.$router.push('/charge-timing')
                 // wx.config({
                 //     debug: true,
                 //     appId: '',

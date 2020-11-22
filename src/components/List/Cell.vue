@@ -71,7 +71,7 @@
         methods: {
             handleClick () {
                 if (this.link && !this.disabled) {
-                    this.$router.replace(this.link + '?redirect=/person')
+                    this.$router.push(this.link)
                 }
             }
         }

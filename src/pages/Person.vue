@@ -15,7 +15,7 @@
                     <p class="money">￥50.00</p>
                     <p class="tip-text">账户余额</p>
                 </div>
-                <div class="user-section-charging-item" @click="handleGoPage('/balance-charge?redirect=/person')">
+                <div class="user-section-charging-item" @click="handleGoPage('/balance-charge')">
                     <img class="charging-icon" src="@/assets/images/icon-person-charging.png" alt="">
                     <p class="tip-text">余额充值</p>
                 </div>
@@ -60,7 +60,7 @@
         },
         methods: {
             handleGoPage(url) {
-                this.$router.replace(url + '?redirect=/person')
+                this.$router.push(url)
             }
         }
     };

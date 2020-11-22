@@ -65,7 +65,9 @@
             handleSelectBalance(index) {
                 this.currentIndex = index
             },
-            handleConfirmCharge() {}
+            handleConfirmCharge() {
+                this.$router.push('/index')
+            }
         }
     };
 </script>

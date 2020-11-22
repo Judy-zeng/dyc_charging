@@ -144,17 +144,11 @@
                 } else {
                     console.log(item)
                 }
-                this.$router.replace({
-                    path: '/charge-detail', query: {
-                        redirect: '/index'
-                    }
-                })
+                this.$router.push('/charge-detail')
             },
             // 去充值
             handleGoPay() {
-                this.$router.replace({path: '/balance-charge', query: {
-                    redirect: '/charge-interface'
-                    }})
+                this.$router.push('/balance-charge')
             },
             getWxConfigSign() {
                 // let url = location.href
