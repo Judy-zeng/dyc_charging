@@ -1,4 +1,6 @@
 module.exports = {
+    publicPath: '/front',
+    productionSourceMap: false,
     devServer: {
         // port: port,
         overlay: {
