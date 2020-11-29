@@ -2,16 +2,16 @@
     <div class="record-cell">
         <div class="cell-title">
             <img src="@/assets/images/icon-charge-detail.png" alt="">
-            <span class="title">{{item.title}}</span>
-            <span class="status" :class="{progress: item.status === 1}">{{item.status === 0 ? '已结束' : '充电中'}}</span>
+            <span class="title">{{item.name}}</span>
+            <span class="status" :class="{progress: item.status === '充电中'}">{{item.status}}</span>
         </div>
         <div class="cell-content">
             <div class="record-cell-hd">
                 <p class="cell-time">订单编号 {{item.order_no}}</p>
-                <p class="cell-type">套餐时长 {{item.time}}  套餐金额 {{item.money}}</p>
+                <p class="cell-type">套餐时长 {{item.charge_time}}  套餐金额 {{item.money}}</p>
             </div>
             <div class="record-cell-ft">
-                <span>{{item.total}}</span>
+                <span>{{item.money}}</span>
             </div>
         </div>
     </div>

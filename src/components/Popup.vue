@@ -5,7 +5,7 @@
                  :class="[`popup-bottom`, isShow ? 'popup-show' : '']">
                 <div class="popup-content">
                     <div class="popup-item"
-                         v-for="(item, index) in payModeList"
+                         v-for="(item, index) in list"
                          :key="index" @click="handleSelectItem(item)">{{item.name}}
                     </div>
                     <div class="popup-item cancel" @click="closeModal">取消</div>
@@ -28,10 +28,7 @@
             return {
                 maskIndex: -1,
                 isShow: false,
-                payModeList: [
-                    {name: '微信支付'},
-                    {name: '钱包支付'}
-                ]
+                list: []
             };
         },
         computed: {},
@@ -41,7 +38,8 @@
         mounted() {
         },
         methods: {
-            showModal() {
+            showModal(data) {
+                this.list = data
                 this.maskIndex = 500
                 this.isShow = true
             },

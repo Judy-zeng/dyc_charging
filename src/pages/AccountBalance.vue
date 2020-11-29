@@ -3,7 +3,7 @@
         <c-header></c-header>
         <div class="page-content">
             <div class="account-balance-info">
-                <p class="total-money">428.88</p>
+                <p class="total-money">{{balance}}</p>
                 <p class="info-text"> 账户余额（元）</p>
                 <button class="info-btn" @click="handleGoCharge">立即充值</button>
             </div>
@@ -23,6 +23,8 @@
     import RecordCell from "@/components/List/RecordCell";
     import Header from "@/components/Header";
 
+    import {accountBalance} from "@/network/api";
+
     export default {
         name: 'AccountBalance',
         components: {
@@ -33,6 +35,7 @@
         props: {},
         data() {
             return {
+                balance: 0,
                 list: [
                     {title: '订单退款', created_at: '2020-11-10 13:00:00', type: '微信支付', money: '2.00', status: 1},
                     {title: '订单消费', created_at: '2020-11-10 13:00:00', type: '余额支付', money: '-2.00', status: 2},
@@ -43,12 +46,31 @@
         computed: {},
         watch: {},
         created() {
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                this.$loading('数据加载中')
+                accountBalance().then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            this.balance = res.data.money
+                            this.list = res.data.list
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close()
+                })
+            },
             handleGoCharge () {
-                this.$router.push('/balance-charge')
+                this.$router.replace('/balance-charge?path=account-balance')
             }
         }
     };

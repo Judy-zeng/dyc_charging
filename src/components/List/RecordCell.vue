@@ -1,10 +1,10 @@
 <template>
     <div class="record-cell">
-        <div class="cell-title">{{item.title}}</div>
+        <div class="cell-title">{{item.type}}</div>
         <div class="cell-content">
             <div class="record-cell-hd">
-                <p class="cell-time">{{item.created_at}}</p>
-                <p class="cell-type">{{item.type}}</p>
+                <p class="cell-time">{{item.consumed_at}}</p>
+                <p class="cell-type">{{item.pay_type}}</p>
             </div>
             <div class="record-cell-ft" :class="recordCls">
                 <span>{{item.money}}</span>
@@ -30,8 +30,8 @@
         },
         computed: {
             recordCls() {
-                const status = {1: 'reback', 2: 'consume', 3: 'charge'}
-                return this.item && (status[this.item.status] || '')
+                const status = { '订单退款': 'reback', '订单消费': 'consume', '余额充值': 'charge'}
+                return this.item && (status[this.item.type] || '')
             }
         },
         watch: {},

@@ -2,20 +2,20 @@
     <div class="page-content">
         <div class="user-info-container">
             <div class="user-info-avatar">
-                <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1605342241545&di=69d7c848829d0ae87d1aaf1a8b036081&imgtype=0&src=http%3A%2F%2Fpic2.zhimg.com%2F50%2Fv2-af83bfea4dbf90fc7d3571ddb00753ec_hd.jpg" alt="">
+                <img :src="userinfo.headimgurl" alt="">
             </div>
             <div class="user-info-nickname">
-                <p class="nickname">远方的风</p>
-                <p class="number">用户编号：20201909098</p>
+                <p class="nickname">{{userinfo.nickname || ''}}</p>
+                <p class="number">用户编号：{{userinfo.member_no || ''}}</p>
             </div>
         </div>
         <div class="user-list-container">
             <div class="user-section-charging">
                 <div class="user-section-charging-item" @click="handleGoPage('/account-balance')">
-                    <p class="money">￥50.00</p>
+                    <p class="money">￥{{userinfo.money || 0}}</p>
                     <p class="tip-text">账户余额</p>
                 </div>
-                <div class="user-section-charging-item" @click="handleGoPage('/balance-charge')">
+                <div class="user-section-charging-item" @click="handleGoPage('/balance-charge?path=person')">
                     <img class="charging-icon" src="@/assets/images/icon-person-charging.png" alt="">
                     <p class="tip-text">余额充值</p>
                 </div>
@@ -36,6 +36,8 @@
 
 <script>
     import Cell from "@/components/List/Cell";
+    import {userCenter} from "@/network/api";
+
     export default {
         name: 'Person',
         components: {
@@ -48,17 +50,34 @@
                 list: [
                     {icon: require('../assets/images/icon-person-history.png'), title: '历史账单', link: '/bill-record'},
                     {icon: require('../assets/images/icon-person-record.png'), title: '充电记录', link: '/charge-record'},
-                    {icon: require('../assets/images/icon-person-phone.png'), title: '客服电话', after: '051267898765'},
-                ]
+                    {icon: require('../assets/images/icon-person-phone.png'), title: '客服电话', after: ''},
+                ],
+                userinfo: {}
             };
         },
         computed: {},
         watch: {},
         created() {
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                userCenter().then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            this.userinfo = res.data || {}
+                            this.list[2].after = res.data.customer_phone || ''
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                })
+            },
             handleGoPage(url) {
                 this.$router.push(url)
             }

@@ -12,7 +12,7 @@
         filters: {},
         props: {
             label: String,
-            value: String
+            value: [String, Number]
         },
         data() {
             return {};

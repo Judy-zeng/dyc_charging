@@ -1,21 +1,20 @@
 <template>
     <div class="page-content">
-        <div class="swiper-banner-container" v-if="banners.length">
-            <swiper class="page-banner-swiper"
-                    ref="mySwiper"
+        <div class="swiper-banner-container" v-if="topBanner.length">
+            <swiper ref="mySwiper"
                     :options="swiperOptions"
                     :auto-update="true"
                     :auto-destroy="true">
-                <swiper-slide class="swiper-slide" v-for="(banner, index) in banners" :key="index">
+                <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
                     <img :src="banner" alt="">
                 </swiper-slide>
-                <div v-if="banners.length > 1" class="swiper-pagination" slot="pagination"></div>
+                <div v-if="topBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
             </swiper>
         </div>
 
-        <div class="swiper-scroll-container">
+        <div class="swiper-scroll-container" v-if="footerBanner.length">
             <swiper class="swiper-scroll" :options="swiperScrollOption">
-                <swiper-slide v-for="(item, index) in scrollBanners" :key="index">
+                <swiper-slide v-for="(item, index) in footerBanner" :key="index">
                     <img :src="item" alt="">
                 </swiper-slide>
             </swiper>
@@ -38,6 +37,9 @@
 
     import wx from 'weixin-js-sdk'
 
+    import {indexList} from "@/network/api";
+    import {setParams} from "@/network/utils";
+
     export default {
         name: 'Index',
         components: {
@@ -48,16 +50,8 @@
         props: {},
         data() {
             return {
-                banners: [
-                    require('../assets/images/index-banner.png'),
-                    require('../assets/images/index-banner.png'),
-                    require('../assets/images/index-banner.png')
-                ], // banner
-                scrollBanners: [
-                    require('../assets/images/index-banner-2.png'),
-                    require('../assets/images/index-banner-2.png'),
-                    require('../assets/images/index-banner-2.png')
-                ],
+                topBanner: [],
+                footerBanner: [],
                 swiperOptions: {
                     observer: true,
                     observeParents: true,
@@ -88,12 +82,36 @@
         computed: {},
         watch: {},
         created() {
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                this.$loading('数据加载中')
+                indexList().then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            let top = res.data.top_banner || []
+                            let footer = res.data.footer_banner || []
+                            this.topBanner = top.length ? top[0].banner : []
+                            this.footerBanner = footer.length ? footer[0].banner : []
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    console.log(e)
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close();
+                })
+            },
             // 调用微信扫码
             handleScanCode() {
+                //::todo 存储扫码回调参数并跳转
+                setParams({code: '20201020'})
                 this.$router.push('/charge-timing')
                 // wx.config({
                 //     debug: true,
@@ -137,50 +155,9 @@
     };
 </script>
 
-<style lang="scss">
-    .swiper-banner-container {
-        .swiper-container-horizontal > .swiper-pagination-bullets {
-            bottom: 0;
-        }
-
-        .swiper-pagination-bullet {
-            background-color: #ffffff;
-            opacity: 1;
-        }
-
-        .swiper-pagination-bullet-active {
-            background-color: $theme-color;
-        }
-    }
-</style>
-
 <style scoped lang="scss">
     .swiper-banner-container {
-        width: 100%;
         height: 7.5rem;
-
-        .swiper-slide {
-            text-align: center;
-            background: #fff;
-
-            /* Center slide text vertically */
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            -webkit-box-pack: center;
-            -ms-flex-pack: center;
-            -webkit-justify-content: center;
-            justify-content: center;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            -webkit-align-items: center;
-            align-items: center;
-
-            img {
-                width: 100%;
-            }
-        }
     }
 
     .swiper-scroll-container {

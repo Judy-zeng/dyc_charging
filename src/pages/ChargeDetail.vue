@@ -1,21 +1,21 @@
 <template>
     <div class="page-container">
-        <c-header>
+        <c-header path="/index">
             <button @click="handleDeviceRepair">设备报修</button>
         </c-header>
         <div class="page-content">
             <div class="charge-detail-title">
                 <img src="@/assets/images/icon-charge-detail.png" alt="">
-                <span>家园华元小区充电站</span>
+                <span>{{chargeInfo.site_name || ''}}</span>
             </div>
             <div class="charge-detail-status" :class="{'over': chargeStatus}">
                 <template v-if="chargeStatus === 0">
                     <img src="@/assets/images/icon-charge-detail-progress.png" alt="">
-                    <p>充电中</p>
+                    <p>{{chargeInfo.status}}</p>
                 </template>
                 <template v-else>
                     <img src="@/assets/images/icon-charge-detail-over.png" alt="">
-                    <p>已结束</p>
+                    <p>{{chargeInfo.status}}</p>
                 </template>
             </div>
 
@@ -23,7 +23,7 @@
                 <list-cell v-for="item in list" :label="item.title" :value="item[item.field]" :key="item.title"/>
             </div>
 
-            <div class="charge-detail-btn" v-if="chargeStatus === 0">
+            <div class="charge-detail-btn" v-if="chargeInfo.status === '充电中'">
                 <button class="charge-btn" @click="handleOverCharge">结束充电</button>
             </div>
         </div>
@@ -33,6 +33,8 @@
 <script>
     import ListViewCell from "@/components/List/ListViewCell";
     import Header from "@/components/Header";
+
+    import {chargeDetail, chargeOver} from "@/network/api";
 
     export default {
         name: 'ChargeDetail',
@@ -46,30 +48,73 @@
             return {
                 chargeStatus: 0, // 0充电中 1已结束
                 list: [
-                    {title: '订单编号', field: 'order_no', order_no: '3877465743657465746'},
-                    {title: '用户编号', field: 'user_no', user_no: '7435647564756'},
-                    {title: '设备编号', field: 'device_no', device_no: '34676435874365'},
-                    {title: '充电口', field: 'interface_nu', interface_nu: '02'},
-                    {title: '套餐时长', field: 'time', time: '120'},
-                    {title: '金额', field: 'money', money: '2.00'},
-                    {title: '支付方式', field: 'type', type: '微信支付'},
-                    {title: '开始时间', field: 'created_at', created_at: '2020-11-09  13:00:00'}
-                ]
+                    {title: '订单编号', field: 'order_no', order_no: ''},
+                    {title: '用户编号', field: 'member_no', member_no: ''},
+                    {title: '设备编号', field: 'device_number', device_number: ''},
+                    {title: '充电口', field: 'port', port: ''},
+                    {title: '套餐时长', field: 'charge_time', charge_time: ''},
+                    {title: '金额', field: 'money', money: ''},
+                    {title: '支付方式', field: 'pay_type', pay_type: ''},
+                    {title: '开始时间', field: 'charge_begin_at', charge_begin_at: ''}
+                ],
+                chargeInfo: {}
             };
         },
         computed: {},
         watch: {},
         created() {
+            if (this.$route.query.order_no) {
+                this._loadData()
+            } else {
+                alert('订单号缺失')
+            }
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                this.$loading('数据加载中')
+                chargeDetail({order_no: this.$route.query.order_no}).then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            let data = res.data
+                            if (data.status === '已结束') {
+                                this.list.push({title: '结束时间', field: 'charge_end_at', charge_end_at: ''})
+                            }
+                            this.list.map(v => {
+                                v[v.field] = data[v.field]
+                            })
+                            this.chargeInfo = data
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close();
+                })
+            },
             handleOverCharge() {
-                this.chargeStatus = 1;
-                this.list.push({title: '结束时间', field: 'finished_at', finished_at: '2020-11-09  13:00:00'})
+                chargeOver({order_no: this.$route.query.order_no}).then(res => {
+                    if (res.status_code === 200) {
+                        this._loadData()
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                })
+                // this.chargeStatus = 1;
+                // this.list.push({title: '结束时间', field: 'charge_end_at', charge_end_at: ''})
             },
             handleDeviceRepair() {
-                this.$router.push('/device-repair')
+                this.$router.push({
+                    path: '/device-repair', query: {
+                        name: this.chargeInfo.site_name || '',
+                        number: this.chargeInfo.device_number || '',
+                        port: this.chargeInfo.port || ''
+                    }
+                })
             }
         }
     };

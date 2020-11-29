@@ -14,7 +14,9 @@
         name: 'Header',
         components: {},
         filters: {},
-        props: {},
+        props: {
+            path: String
+        },
         data() {
             return {
                 redirect: undefined // 跳转路径
@@ -35,7 +37,11 @@
         },
         methods: {
             back() {
-                this.$router.go(-1)
+                if (this.path) {
+                    this.$router.replace(this.path)
+                } else {
+                    this.$router.go(-1)
+                }
             }
         }
     };

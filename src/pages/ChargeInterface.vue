@@ -2,14 +2,24 @@
     <div class="page-container">
         <c-header></c-header>
         <div class="page-content">
-            <div class="banner-container">
-                <img src="@/assets/images/index-banner.png" alt="">
+            <div class="swiper-banner-container banner-container">
+                <swiper ref="myTimingSwiper"
+                        :options="swiperOptions"
+                        :auto-update="true"
+                        :auto-destroy="true">
+                    <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
+                        <img :src="banner" alt="">
+                    </swiper-slide>
+                </swiper>
             </div>
+            <!--            <div class="banner-container">-->
+            <!--                <img src="@/assets/images/index-banner.png" alt="">-->
+            <!--            </div>-->
 
             <div class="charge-money-container">
                 <div class="money">
                     <span>钱包余额</span>
-                    <span class="total-money">180.00</span>
+                    <span class="total-money">{{totalMoney}}</span>
                 </div>
                 <div class="invest-btn" @click="handleGoPay">
                     <span>去充值</span>
@@ -31,15 +41,15 @@
                          :class="{active: currentInterface === index}"
                          @click="handleSelectInterface(item, index)"
                          v-for="(item, index) in list"
-                         :key="item.pos">
+                         :key="item.port">
                         <img v-if="currentInterface === index" src="@/assets/images/icon-charge-interface-selected.png"
                              alt="">
                         <template v-else>
-                            <img v-if="item.status === 1" src="@/assets/images/icon-charge-interface-free.png" alt="">
-                            <img v-if="item.status === 2" src="@/assets/images/icon-charge-interface-use.png" alt="">
-                            <img v-if="item.status === 3" src="@/assets/images/icon-charge-interface-error.png" alt="">
+                            <img v-if="item.status === 0" src="@/assets/images/icon-charge-interface-free.png" alt="">
+                            <img v-if="item.status === 1" src="@/assets/images/icon-charge-interface-use.png" alt="">
+                            <img v-if="item.status === 2" src="@/assets/images/icon-charge-interface-error.png" alt="">
                         </template>
-                        <p>{{item.pos > 9 ? item.pos : '0' + item.pos}}</p>
+                        <p>{{item.port > 9 ? item.port : '0' + item.port}}</p>
                     </div>
                 </div>
 
@@ -49,16 +59,16 @@
                             :options="swiperOptions"
                             :auto-update="true"
                             :auto-destroy="true">
-                        <swiper-slide class="swiper-slide" v-for="(banner, index) in banners" :key="index">
+                        <swiper-slide class="swiper-slide" v-for="(banner, index) in footerBanner" :key="index">
                             <img :src="banner" alt="">
                         </swiper-slide>
-                        <div v-if="banners.length > 1" class="swiper-pagination" slot="pagination"></div>
+                        <div v-if="footerBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
                     </swiper>
                 </div>
             </div>
 
             <div class="charge-timing-btn">
-                <button class="charge-btn" :disabled="currentStatus !== 1" @click="handleShowPay">付款充电</button>
+                <button class="charge-btn" :disabled="currentStatus !== 0" @click="handleShowPay">付款充电</button>
             </div>
         </div>
         <popup ref="payPopup" @on-change="handlePayMode"></popup>
@@ -73,6 +83,9 @@
     import Header from "@/components/Header";
     import wx from "weixin-js-sdk";
 
+    import {interfaceList, orderPay, paySuccess} from "@/network/api";
+    import {getParams} from "@/network/utils";
+
     export default {
         name: 'ChargeInterface',
         components: {
@@ -86,19 +99,9 @@
         data() {
             return {
                 currentInterface: 0,
-                currentStatus: 1,
-                list: [ // 1空闲 2使用中 3故障
-                    {pos: 1, status: 2},
-                    {pos: 2, status: 3},
-                    {pos: 3, status: 1},
-                    {pos: 4, status: 2},
-                    {pos: 5, status: 1},
-                    {pos: 6, status: 1},
-                    {pos: 7, status: 3},
-                    {pos: 8, status: 2},
-                    {pos: 9, status: 1},
-                    {pos: 10, status: 1}
-                ],
+                currentStatus: 0,
+                totalMoney: 0, // 余额
+                list: [], // 0空闲 1使用中 2故障
                 swiperOptions: {
                     observer: true,
                     observeParents: true,
@@ -110,67 +113,102 @@
                         disableOnInteraction: false
                     }
                 },
-                banners: [
-                    require('../assets/images/index-banner.png'),
-                    require('../assets/images/index-banner.png'),
-                    require('../assets/images/index-banner.png')
-                ], // banner
+                topBanner: [],
+                footerBanner: [],
+                payModeList: [
+                    {id: 1, name: '微信支付'},
+                    {id: 2, name: '钱包支付'}
+                ]
             };
         },
         computed: {},
         watch: {},
         created() {
-            for (let i = 0; i <= this.list.length; i++) {
-                if (this.list[i].status === 1) {
-                    this.currentInterface = i;
-                    break;
-                }
-            }
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                let params = getParams()
+                this.$loading('数据加载中')
+                interfaceList({device_number: params.code}).then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            let top = res.data.top_banner || []
+                            let footer = res.data.footer_banner || []
+                            this.topBanner = top.length ? top[0].banner : []
+                            this.footerBanner = footer.length ? footer[0].banner : []
+
+                            this.list = res.data.ports || []
+
+                            for (let i = 0; i < this.list.length; i++) {
+                                if (this.list[i].status === 0) {
+                                    this.currentInterface = i;
+                                    break;
+                                }
+                            }
+
+                            this.totalMoney = res.data.money
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close();
+                })
+            },
             handleSelectInterface(item, index) {
                 this.currentInterface = index
                 this.currentStatus = item.status
             },
             handleShowPay() {
-                this.$refs.payPopup.showModal()
+                this.$refs.payPopup.showModal(this.payModeList)
             },
             // 发起支付
             handlePayMode(item) {
-                if (item === '微信支付') {
-                    this.getWxConfigSign()
-                } else {
-                    console.log(item)
+                let _params = getParams()
+                let _port = this.list[this.currentInterface]
+                let params = {
+                    device_number: _params.code,
+                    consume_type: 2, // 充电付款
+                    pay_type: item.id,
+                    money: _params.money,
+                    port: _port.port,
+                    charge_time: _params.time
                 }
-                this.$router.push('/charge-detail')
+                this.confirmPayOrder(params)
+                // this.$router.push('/charge-detail')
             },
             // 去充值
             handleGoPay() {
-                this.$router.push('/balance-charge')
+                this.$router.replace('/balance-charge?path=charge-interface')
             },
-            getWxConfigSign() {
-                // let url = location.href
+            // 微信支付签名
+            getWxConfigSign(data) {
                 wx.config({
-                    debug: true,
-                    appId: '',
-                    timestamp: '',
-                    nonceStr: '',
-                    signature: '',
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.paySign,
                     jsApiList: ['chooseWXPay']
                 })
 
                 wx.ready(() => {
                     wx.chooseWXPay({
-                        timestamp: 0,
-                        nonceStr: '',
-                        package: '', // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                        signType: '', // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                        paySign: '', // 支付签名
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        package: data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                        signType: data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                        paySign: data.paySign, // 支付签名
                         success: function (res) {
                             console.log(res)
                             // 支付成功后的回调函数
+                            this.wechatPaySuccess(data.order_no)
                         },
                         fail: function (err) {
                             console.log(err.errMsg)
@@ -180,6 +218,35 @@
                     wx.error(res => {
                         console.log(res.errMsg)
                     })
+                })
+            },
+            // 选择微信/余额支付
+            confirmPayOrder(data) {
+                orderPay(data).then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            if (data.pay_type === 1) { // 微信支付
+                                this.getWxConfigSign(res.data)
+                            } else {
+                                this.$router.push('/charge-detail?order_no=' +res.data.order_no)
+                            }
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                })
+            },
+            // 支付成功确认
+            wechatPaySuccess(orderNo) {
+                paySuccess({order_no: orderNo}).then(res => {
+                    if (res.status_code === 200) {
+                        this.$router.push('/charge-detail?order_no=' + orderNo)
+                    }
+                }).catch(e => {
+                    alert(e.message)
                 })
             }
         }
@@ -210,11 +277,6 @@
             background-color: #E3E3E3;
             border-bottom: solid 0.25rem #E3E3E3;
             box-sizing: border-box;
-
-            img {
-                width: 100%;
-                height: 100%;
-            }
         }
 
         .charge-money-container {

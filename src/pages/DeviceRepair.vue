@@ -7,30 +7,34 @@
                     <img src="@/assets/images/icon-index-scan.png" alt="">
                 </div>
                 <div class="device-info-item">
-                    <p class="device-address">某某小区充电站</p>
-                    <p class="device-number">设备号：783647673</p>
-                    <p class="device-interface">充电口：01</p>
+                    <p class="device-address">{{chargeInfo.name}}</p>
+                    <p class="device-number">设备号：{{chargeInfo.number}}</p>
+                    <p class="device-interface">充电口：{{chargeInfo.port}}</p>
                 </div>
             </div>
 
             <div class="device-repair-form">
                 <div class="form-item">
                     <div class="label">报修人</div>
-                    <input class="input" type="text" placeholder="请输入报修人">
+                    <input v-model="formData.name" class="input" type="text" placeholder="请输入报修人">
                 </div>
                 <div class="form-item">
                     <div class="label">联系方式</div>
-                    <input class="input" type="text" placeholder="请输入联系方式">
+                    <input v-model="formData.phone"
+                           @blur="handleUpperCase"
+                           class="input"
+                           type="text"
+                           placeholder="请输入联系方式">
                 </div>
                 <div class="form-item online">
                     <div class="label">故障原因</div>
                     <div class="input">
-                        <textarea style="resize: none" placeholder="请输入故障原因"></textarea>
+                        <textarea v-model="formData.reason" style="resize: none" placeholder="请输入故障原因"></textarea>
                     </div>
                 </div>
 
                 <div class="device-repair-btn">
-                    <button class="charge-btn" @click="handleConfirm">提交</button>
+                    <button :disabled="loading" class="charge-btn" @click="handleConfirm">提交</button>
                 </div>
             </div>
         </div>
@@ -39,6 +43,7 @@
 
 <script>
     import Header from "@/components/Header";
+    import {deviceRepair} from "@/network/api";
 
     export default {
         name: 'DeviceRepair',
@@ -48,17 +53,74 @@
         filters: {},
         props: {},
         data() {
-            return {};
+            return {
+                chargeInfo: {
+                    name: '',
+                    number: '',
+                    port: ''
+                },
+                formData: {
+                    name: '',
+                    phone: '',
+                    reason: ''
+                },
+                loading: false
+            };
         },
         computed: {},
         watch: {},
         created() {
+            if (this.$route.query) {
+                for (let i in this.$route.query) {
+                    this.chargeInfo[i] = this.$route.query[i]
+                }
+            }
         },
         mounted() {
         },
         methods: {
             handleConfirm() {
-                this.$router.push('/index')
+                if (!this.formData.name) {
+                    alert('请输入报修人')
+                    return
+                }
+                if (!this.formData.phone) {
+                    alert('请输入联系方式')
+                    return
+                }
+                if (!this.formData.reason) {
+                    alert('请输入故障原因')
+                    return
+                }
+
+                let params = {
+                    name: this.formData.name,
+                    site_name: this.chargeInfo.name,
+                    device_number: this.chargeInfo.number,
+                    port: this.chargeInfo.port,
+                    phone: this.formData.phone,
+                    reason: this.formData.reason
+                }
+                this.loading = true
+                deviceRepair(params).then(res => {
+                    if (res.status_code === 200) {
+                        alert('已提交报修信息')
+                        this.$router.go(-1)
+                    }
+                }).finally(() => {
+                    this.loading = false
+                })
+            },
+            handleUpperCase(e) {
+                const reg = /^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$/;
+                if (e.target.value === '') {
+                    alert('请输入手机号')
+                    return false
+                }
+                if (!reg.test(e.target.value)) {
+                    alert('请输入正确格式的手机号')
+                    return false
+                }
             }
         }
     };

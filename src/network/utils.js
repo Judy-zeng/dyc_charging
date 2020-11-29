@@ -9,3 +9,19 @@ export function getToken () {
     }
     return null
 }
+
+export function getParams() {
+    let _val = Cookie.get('QUERY_PARAMS')
+    if (_val) return JSON.parse(_val)
+    return {}
+}
+
+export function setParams(val) {
+    let obj = Cookie.get('QUERY_PARAMS')
+    let params = obj ? JSON.parse(obj) : {}
+    for (let key in val) {
+        params[key] = val[key]
+    }
+    console.log(params)
+    Cookie.set('QUERY_PARAMS', params)
+}

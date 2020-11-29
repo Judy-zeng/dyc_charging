@@ -1,15 +1,23 @@
 <template>
     <div class="page-container">
-        <c-header></c-header>
+        <c-header :path="rebackPath"></c-header>
         <div class="page-content">
-            <div class="banner-container">
-                <img src="@/assets/images/index-banner.png" alt="">
+            <div class="swiper-banner-container banner-container" v-if="topBanner.length">
+                <swiper ref="mySwiper"
+                        :options="swiperOptions"
+                        :auto-update="true"
+                        :auto-destroy="true">
+                    <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
+                        <img :src="banner" alt="">
+                    </swiper-slide>
+                    <div v-if="topBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
+                </swiper>
             </div>
 
             <div class="balance-charge-container">
                 <div class="title">充值金额</div>
                 <div class="my-balance">
-                    我的余额：50.00元
+                    我的余额：{{balance}}元
                 </div>
                 <div class="charge-list">
                     <div class="charge-list-title">请选择充值金额</div>
@@ -21,13 +29,13 @@
                              :key="index">
                             <div :class="{active: currentIndex === index}"
                                  class="box-item">{{item.money}}</div>
-                            <span>{{item.tip}}</span>
+                            <span>{{item.remark}}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="charge-balance-btn">
-                    <button class="charge-btn" @click="handleConfirmCharge">充值</button>
+                    <button class="charge-btn" :disabled="loading" @click="handleConfirmCharge">充值</button>
                 </div>
             </div>
         </div>
@@ -36,37 +44,142 @@
 
 <script>
     import Header from "@/components/Header";
+    import {balanceCharge, orderPay, paySuccess} from "@/network/api";
+    import {swiper, swiperSlide} from "vue-awesome-swiper";
+    import wx from "weixin-js-sdk";
 
     export default {
         name: 'BalanceRecharge',
         components: {
-            'c-header': Header
+            'c-header': Header,
+            swiper,
+            swiperSlide
         },
         filters: {},
         props: {},
         data() {
             return {
+                loading: false,
+                rebackPath: '',
                 currentIndex: 0,
-                list: [
-                    { money: 50, tip: ''},
-                    { money: 100, tip: '充100送1元'},
-                    { money: 200, tip: '充100送1元'},
-                    { money: 500, tip: '充100送1元'}
-                ]
+                balance: 0,
+                list: [],
+                topBanner: [],
+                swiperOptions: {
+                    observer: true,
+                    observeParents: true,
+                    pagination: {
+                        el: '.swiper-pagination'
+                    },
+                    autoplay: {
+                        delay: 2500,
+                        disableOnInteraction: false
+                    }
+                }
             };
         },
         computed: {},
         watch: {},
         created() {
+            if (this.$route.query.path) {
+                this.rebackPath = this.$route.query.path
+            }
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                this.$loading('数据加载中')
+                balanceCharge().then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            this.balance = res.data.money
+                            this.list = res.data.list
+                            let top = res.data.top_banner || []
+                            this.topBanner = top.length ? top[0].banner : []
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close()
+                })
+            },
             handleSelectBalance(index) {
                 this.currentIndex = index
             },
             handleConfirmCharge() {
-                this.$router.push('/index')
+                let item = this.list[this.currentIndex]
+                let params = {
+                    consume_type: 1, // 会员充值
+                    pay_type: 1,
+                    money: item.money,
+                    giving_money: item.giving_money
+                }
+                this.confirmPayOrder(params)
+                // this.$router.push('/index')
+            },
+            // 选择微信/余额支付
+            confirmPayOrder(data) {
+                orderPay(data).then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            this.getWxConfigSign(res.data)
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                })
+            },
+            // 微信支付签名
+            getWxConfigSign(data) {
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.paySign,
+                    jsApiList: ['chooseWXPay']
+                })
+
+                wx.ready(() => {
+                    wx.chooseWXPay({
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        package: data.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                        signType: data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                        paySign: data.paySign, // 支付签名
+                        success: function (res) {
+                            console.log(res)
+                            // 支付成功后的回调函数
+                            this.wechatPaySuccess(data.order_no)
+                        },
+                        fail: function (err) {
+                            console.log(err.errMsg)
+                        }
+                    })
+
+                    wx.error(res => {
+                        console.log(res.errMsg)
+                    })
+                })
+            },
+            // 支付成功确认
+            wechatPaySuccess(orderNo) {
+                paySuccess({order_no: orderNo}).then(res => {
+                    if (res.status_code === 200) {
+                        this.$router.replace(this.rebackPath || '/person')
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                })
             }
         }
     };

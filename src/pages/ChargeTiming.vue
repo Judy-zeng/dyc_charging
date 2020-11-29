@@ -2,8 +2,15 @@
     <div class="page-container">
         <c-header></c-header>
         <div class="page-content">
-            <div class="banner-container">
-                <img src="@/assets/images/index-banner.png" alt="">
+            <div class="swiper-banner-container top-banner-swiper">
+                <swiper ref="myTimingSwiper"
+                        :options="swiperOptions"
+                        :auto-update="true"
+                        :auto-destroy="true">
+                    <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
+                        <img :src="banner" alt="">
+                    </swiper-slide>
+                </swiper>
             </div>
             <div class="charge-timing-container">
                 <div class="header">
@@ -14,16 +21,23 @@
                 <div class="charge-timing-box">
                     <div class="box-item"
                          @click="handleSelectTiming(item)"
-                         :class="{active: currentList.time === item.time}"
+                         :class="{active: currentList.minutes === item.minutes}"
                          v-for="item in list"
                          :key="item.time">
-                        {{item.time}}
+                        {{item.minutes}}
                     </div>
                 </div>
             </div>
 
-            <div class="charge-advertisement">
-                <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1605345004146&di=5e93cbf5b683a928dbeca174489cf070&imgtype=0&src=http%3A%2F%2Fimg1.imgtn.bdimg.com%2Fit%2Fu%3D2506197831%2C1636712722%26fm%3D214%26gp%3D0.jpg" alt="">
+            <div class="swiper-banner-container charge-advertisement">
+                <swiper ref="myTimingSwiper"
+                        :options="swiperOptions"
+                        :auto-update="true"
+                        :auto-destroy="true">
+                    <swiper-slide class="swiper-slide" v-for="(banner, index) in footerBanner" :key="index">
+                        <img :src="banner" alt="">
+                    </swiper-slide>
+                </swiper>
             </div>
 
             <div class="charge-timing-btn">
@@ -34,40 +48,76 @@
 </template>
 
 <script>
+    import {swiper, swiperSlide} from 'vue-awesome-swiper'
+    import 'swiper/dist/css/swiper.css'
     import Header from "@/components/Header";
+    import {timingList} from "@/network/api";
+    import {getParams, setParams} from "@/network/utils";
+
     export default {
         name: 'ChargeTiming',
         components: {
-            'c-header': Header
+            'c-header': Header,
+            swiper,
+            swiperSlide
         },
         filters: {},
         props: {},
         data() {
             return {
                 currentList: {},
-                list: [
-                    { time: 60, money: 1 },
-                    { time: 120, money: 2 },
-                    { time: 180, money: 3 },
-                    { time: 240, money: 4 },
-                    { time: 300, money: 5 },
-                    { time: 360, money: 6 },
-                    { time: 420, money: 7 },
-                    { time: 480, money: 8 },
-                    { time: 540, money: 9 }
-                ]
+                topBanner: [],
+                footerBanner: [],
+                list: [],
+                swiperOptions: {
+                    observer: true,
+                    observeParents: true,
+                    pagination: {
+                        el: '.timing-swiper-pagination'
+                    },
+                    autoplay: {
+                        delay: 2500,
+                        disableOnInteraction: false
+                    }
+                }
             };
         },
         computed: {},
         watch: {},
         created() {
-            this.currentList = this.list[0]
+            this._loadData()
         },
         mounted() {
         },
         methods: {
+            _loadData() {
+                let params = getParams()
+                this.$loading('数据加载中')
+                timingList({device_number: params.code}).then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            let top = res.data.top_banner || []
+                            let footer = res.data.footer_banner || []
+                            this.topBanner = top.length ? top[0].banner : []
+                            this.footerBanner = footer.length ? footer[0].banner : []
+
+                            this.list = res.data.time_package || []
+                            this.currentList = this.list.length ? this.list[0] : {}
+                            setParams({time: this.currentList.minutes, money: this.currentList.money})
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close();
+                })
+            },
             handleSelectTiming (item) {
                 this.currentList = item
+                setParams({time: item.minutes, money: item.money})
             },
             handleNextStep () {
                 this.$router.push('/charge-interface')
@@ -78,15 +128,11 @@
 
 <style scoped lang="scss">
 .page-container {
-    .banner-container {
+    .top-banner-swiper {
         height: 7.5rem;
         background-color: #E3E3E3;
         border-bottom: solid 0.25rem #E3E3E3;
         box-sizing: border-box;
-        img {
-            width: 100%;
-            height: 100%;
-        }
     }
     .charge-timing-container {
         padding: 0.6rem 0.5rem;
@@ -128,12 +174,7 @@
     }
 
     .charge-advertisement {
-        width: 100%;
         height: 7.5rem;
-        img {
-            width: 100%;
-            height: 100%;
-        }
     }
 
     .charge-timing-btn {

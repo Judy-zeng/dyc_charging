@@ -10,6 +10,7 @@
 <script>
     import ChargeCell from "@/components/List/ChargeCell";
     import Header from "@/components/Header";
+    import {chargeRecord} from "@/network/api";
 
     export default {
         name: 'ChargeRecord',
@@ -21,23 +22,35 @@
         props: {},
         data() {
             return {
-                list: [
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 1, total: '2.00'},
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 0, total: '2.00'},
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 0, total: '2.00'},
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 0, total: '2.00'},
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 0, total: '2.00'},
-                    {title: '家园华元小区充电站', order_no: '3877465743657465746', time: '120', money: '2.00', status: 0, total: '2.00'},
-                ]
+                list: []
             };
         },
         computed: {},
         watch: {},
         created() {
+            this._loadData()
         },
         mounted() {
         },
-        methods: {}
+        methods: {
+            _loadData() {
+                this.$loading('数据加载中')
+                chargeRecord().then(res => {
+                    switch (res.status_code) {
+                        case 200: {
+                            this.list = res.data
+                            break;
+                        }
+                        default:
+                            alert(res.status_code + ':' + res.message)
+                    }
+                }).catch(e => {
+                    alert(e.message)
+                }).finally(() => {
+                    this.$loading.close()
+                })
+            }
+        }
     };
 </script>
 
