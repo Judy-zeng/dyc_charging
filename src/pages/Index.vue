@@ -25,7 +25,7 @@
                 <img src="@/assets/images/icon-index-scan.png" alt="">
             </div>
             <div class="scan-qrcode-btn">
-                <button class="btn btn-plain" @click="handleScanCode">扫码充电</button>
+                <button :disabled="loading" class="btn btn-plain" @click="_loadWechatSign">扫码充电</button>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
 
     import wx from 'weixin-js-sdk'
 
-    import {indexList} from "@/network/api";
+    import {indexList, wechatSign} from "@/network/api";
     import {setParams} from "@/network/utils";
 
     export default {
@@ -50,6 +50,7 @@
         props: {},
         data() {
             return {
+                loading: false,
                 topBanner: [],
                 footerBanner: [],
                 swiperOptions: {
@@ -83,6 +84,7 @@
         watch: {},
         created() {
             this._loadData()
+            // this._loadWechatSign()
         },
         mounted() {
         },
@@ -98,6 +100,10 @@
                             this.footerBanner = footer.length ? footer[0].banner : []
                             break;
                         }
+                        case 401: {
+                            location.href = res.message
+                            break;
+                        }
                         default:
                             alert(res.status_code + ':' + res.message)
                     }
@@ -108,48 +114,79 @@
                     this.$loading.close();
                 })
             },
+            _loadWechatSign() {
+                this.loading = true
+                wechatSign().then(res => {
+                    if (res.status_code === 200) {
+                        this.handleScanCode(res.data)
+                    }
+                }).catch(e => {
+                    this.loading = false
+                }).finally(() => {
+                    this.loading = false
+                })
+            },
             // 调用微信扫码
-            handleScanCode() {
+            handleScanCode(data) {
+                this.loading = false
                 //::todo 存储扫码回调参数并跳转
-                setParams({code: '20201020'})
-                this.$router.push('/charge-timing')
-                // wx.config({
-                //     debug: true,
-                //     appId: '',
-                //     timestamp: '',
-                //     nonceStr: '',
-                //     signature: '',
-                //     jsApiList: ['scanQRCode']
-                // })
-                // // let _this = this
-                // wx.ready(() => {
-                //     wx.checkJsApi({
-                //         jsApiList: ['scanQRCode'],
-                //         success: function (res) {
-                //             if (res.checkResult.scanQRCode === true) {
-                //                 wx.scanQRCode({
-                //                     desc: 'desc',
-                //                     needResult: 1,
-                //                     scanType: ['qrCode'],
-                //                     success(res) {
-                //                         let result = res.resultStr
-                //                         console.log(result)
-                //                         this.$router.push('/charge-timing')
-                //                     }
-                //                 })
-                //             } else {
-                //                 console.log('客服端不支持扫一扫')
-                //             }
-                //         },
-                //         fail: function (res) {
-                //             console.log(res)
-                //         }
-                //     })
-                //
-                //     wx.error(res => {
-                //         console.log(res.errMsg)
-                //     })
-                // })
+                // setParams({code: '20201020'})
+                // this.$router.push('/charge-timing')
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: ['scanQRCode']
+                })
+                let _this = this
+                wx.ready(() => {
+                    wx.checkJsApi({
+                        jsApiList: ['scanQRCode'],
+                        success: function (res) {
+                            if (res.checkResult.scanQRCode === true) {
+                                wx.scanQRCode({
+                                    desc: 'desc',
+                                    needResult: 1,
+                                    scanType: ['qrCode', 'barCode'],
+                                    success(res) {
+                                        let path = _this.param2Obj(res.resultStr)
+                                        if (path.device_number) {
+                                            setParams({code: path.device_number || ''})
+                                            _this.$router.push('/charge-timing')
+                                        }
+                                    }
+                                })
+                            } else {
+                                alert('客服端不支持扫一扫')
+                                console.log('客服端不支持扫一扫')
+                            }
+                        },
+                        fail: function (res) {
+                            console.log(res)
+                        }
+                    })
+
+                    wx.error(res => {
+                        // console.log(res.errMsg)
+                    })
+                })
+            },
+            param2Obj(url) {
+                const search = url.split('?')[1];
+                if (!search) {
+                    return {};
+                }
+                return JSON.parse(
+                    '{"' +
+                    decodeURIComponent(search)
+                        .replace(/"/g, '\\"')
+                        .replace(/&/g, '","')
+                        .replace(/=/g, '":"')
+                        .replace(/\+/g, ' ') +
+                    '"}'
+                );
             }
         }
     };

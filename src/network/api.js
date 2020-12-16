@@ -75,3 +75,8 @@ export const chargeRecord = (params) => service.get('/api/recharge/record', {par
  * 历史账单
  */
 export const billRecord = (params) => service.get('/api/bill/record', {params})
+
+/**
+ * 微信签名
+ */
+export const wechatSign = (params) => service.get('/api/wechat/sign', { params })
