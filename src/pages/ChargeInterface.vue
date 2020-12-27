@@ -198,6 +198,7 @@
                     jsApiList: ['chooseWXPay']
                 })
 
+                let _this = this
                 wx.ready(() => {
                     wx.chooseWXPay({
                         timestamp: data.timestamp,
@@ -208,7 +209,7 @@
                         success: function (res) {
                             console.log(res)
                             // 支付成功后的回调函数
-                            this.wechatPaySuccess(data.order_no)
+                            _this.wechatPaySuccess(data.order_no)
                         },
                         fail: function (err) {
                             console.log(err.errMsg)
