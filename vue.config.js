@@ -1,5 +1,5 @@
 module.exports = {
-    publicPath: '/front',
+    publicPath: '/',
     productionSourceMap: false,
     devServer: {
         // port: port,

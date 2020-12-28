@@ -149,6 +149,7 @@
                     jsApiList: ['chooseWXPay']
                 })
 
+                let _this = this
                 wx.ready(() => {
                     wx.chooseWXPay({
                         timestamp: data.timestamp,
@@ -157,9 +158,8 @@
                         signType: data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
                         paySign: data.paySign, // 支付签名
                         success: function (res) {
-                            console.log(res)
                             // 支付成功后的回调函数
-                            this.wechatPaySuccess(data.order_no)
+                            _this.wechatPaySuccess(data.order_no)
                         },
                         fail: function (err) {
                             console.log(err.errMsg)
@@ -175,7 +175,10 @@
             wechatPaySuccess(orderNo) {
                 paySuccess({order_no: orderNo}).then(res => {
                     if (res.status_code === 200) {
-                        this.$router.replace(this.rebackPath || '/person')
+                        let host = window.location.origin
+                        let path = this.rebackPath ? host + this.rebackPath : host + '/person';
+                        window.location.href = path
+                        // this.$router.replace(this.rebackPath || '/person')
                     }
                 }).catch(e => {
                     alert(e.message)

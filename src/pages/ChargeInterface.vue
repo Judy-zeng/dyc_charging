@@ -207,8 +207,6 @@
                         signType: data.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
                         paySign: data.paySign, // 支付签名
                         success: function (res) {
-                            console.log(res)
-                            // 支付成功后的回调函数
                             _this.wechatPaySuccess(data.order_no)
                         },
                         fail: function (err) {
@@ -244,7 +242,9 @@
             wechatPaySuccess(orderNo) {
                 paySuccess({order_no: orderNo}).then(res => {
                     if (res.status_code === 200) {
-                        this.$router.push('/charge-detail?order_no=' + orderNo)
+                        let host = window.location.origin
+                        window.location.href = host + '/charge-detail?order_no=' + orderNo
+                        // this.$router.push('/charge-detail?order_no=' + orderNo)
                     }
                 }).catch(e => {
                     alert(e.message)
