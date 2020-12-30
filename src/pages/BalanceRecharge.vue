@@ -175,8 +175,10 @@
             wechatPaySuccess(orderNo) {
                 paySuccess({order_no: orderNo}).then(res => {
                     if (res.status_code === 200) {
+                        // window.location.reload()
                         let host = window.location.origin
-                        let path = this.rebackPath ? host + this.rebackPath : host + '/person';
+                        // window.location.href = host + '/account-balance'
+                        let path = this.rebackPath ? host + '/' + this.rebackPath : host + '/account-balance';
                         window.location.href = path
                         // this.$router.replace(this.rebackPath || '/person')
                     }

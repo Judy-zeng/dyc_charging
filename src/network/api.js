@@ -79,4 +79,4 @@ export const billRecord = (params) => service.get('/api/bill/record', {params})
 /**
  * 微信签名
  */
-export const wechatSign = (params) => service.get('/api/wechat/sign', { params })
+export const wechatSign = (params) => service.get(`/api/wechat/sign?${params}`)

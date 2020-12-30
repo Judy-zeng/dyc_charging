@@ -25,7 +25,7 @@
                 <img src="@/assets/images/icon-index-scan.png" alt="">
             </div>
             <div class="scan-qrcode-btn">
-                <button :disabled="loading" class="btn btn-plain" @click="_loadWechatSign">扫码充电</button>
+                <button class="btn btn-plain" @click="_loadWechatSign">扫码充电</button>
             </div>
         </div>
     </div>
@@ -38,7 +38,7 @@
     import wx from 'weixin-js-sdk'
 
     import {indexList, wechatSign} from "@/network/api";
-    import {setParams} from "@/network/utils";
+    import {setParams, getParams, getType} from "@/network/utils";
 
     export default {
         name: 'Index',
@@ -51,6 +51,7 @@
         data() {
             return {
                 loading: false,
+                signs: null,
                 topBanner: [],
                 footerBanner: [],
                 swiperOptions: {
@@ -115,9 +116,19 @@
                 })
             },
             _loadWechatSign() {
+                // let host = window.location.origin
+                let url = ''
+                let type = getType()
+                if (+type === 1) {
+                    let _p = getParams()
+                    url = `device_number=${_p.code}`
+                } else {
+                    url = 'device_number='
+                }
                 this.loading = true
-                wechatSign().then(res => {
+                wechatSign(url).then(res => {
                     if (res.status_code === 200) {
+                        // this.signs = res.data
                         this.handleScanCode(res.data)
                     }
                 }).catch(e => {
@@ -128,10 +139,11 @@
             },
             // 调用微信扫码
             handleScanCode(data) {
-                this.loading = false
-                //::todo 存储扫码回调参数并跳转
-                // setParams({code: '20201020'})
-                // this.$router.push('/charge-timing')
+                // if (!this.signs) {
+                //     alert('签名错误')
+                //     return
+                // }
+                // let data = this.signs
                 wx.config({
                     debug: false,
                     appId: data.appId,

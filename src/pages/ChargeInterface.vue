@@ -152,6 +152,10 @@
                             this.totalMoney = res.data.money
                             break;
                         }
+                        case 401: {
+                            location.href = res.message
+                            break;
+                        }
                         default:
                             alert(res.status_code + ':' + res.message)
                     }

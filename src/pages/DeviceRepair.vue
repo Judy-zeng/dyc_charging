@@ -14,28 +14,30 @@
             </div>
 
             <div class="device-repair-form">
-                <div class="form-item">
-                    <div class="label">报修人</div>
-                    <input v-model="formData.name" class="input" type="text" placeholder="请输入报修人">
-                </div>
-                <div class="form-item">
-                    <div class="label">联系方式</div>
-                    <input v-model="formData.phone"
-                           @blur="handleUpperCase"
-                           class="input"
-                           type="text"
-                           placeholder="请输入联系方式">
-                </div>
-                <div class="form-item online">
-                    <div class="label">故障原因</div>
-                    <div class="input">
-                        <textarea v-model="formData.reason" style="resize: none" placeholder="请输入故障原因"></textarea>
+                <form autocomplete="off" @submit.prevent="onSubmit">
+                    <div class="form-item">
+                        <div class="label">报修人</div>
+                        <input v-model="formData.name" class="input" type="text" placeholder="请输入报修人">
                     </div>
-                </div>
+                    <div class="form-item">
+                        <div class="label">联系方式</div>
+                        <input v-model="formData.phone"
+                               @blur="handleUpperCase"
+                               class="input"
+                               type="text"
+                               placeholder="请输入联系方式">
+                    </div>
+                    <div class="form-item online">
+                        <div class="label">故障原因</div>
+                        <div class="input">
+                            <textarea v-model="formData.reason" style="resize: none" placeholder="请输入故障原因"></textarea>
+                        </div>
+                    </div>
 
-                <div class="device-repair-btn">
-                    <button :disabled="loading" class="charge-btn" @click="handleConfirm">提交</button>
-                </div>
+                    <div class="device-repair-btn">
+                        <button class="charge-btn" v-on:click="handleConfirm">提交</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -79,6 +81,9 @@
         mounted() {
         },
         methods: {
+            onSubmit() {
+                return false
+            },
             handleConfirm() {
                 if (!this.formData.name) {
                     alert('请输入报修人')
@@ -101,12 +106,15 @@
                     phone: this.formData.phone,
                     reason: this.formData.reason
                 }
-                this.loading = true
                 deviceRepair(params).then(res => {
                     if (res.status_code === 200) {
                         alert('已提交报修信息')
                         this.$router.go(-1)
+                    } else {
+                        alert('提交失败')
                     }
+                }).catch(e => {
+                    alert(e.message)
                 }).finally(() => {
                     this.loading = false
                 })

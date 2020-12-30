@@ -25,3 +25,11 @@ export function setParams(val) {
     console.log(params)
     Cookie.set('QUERY_PARAMS', params)
 }
+
+export function setType(val) {
+    Cookie.set('DYC_TYPE', val)
+}
+
+export function getType() {
+    return Cookie.get('DYC_TYPE')
+}
