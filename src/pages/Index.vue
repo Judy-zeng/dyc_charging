@@ -6,28 +6,40 @@
                     :auto-update="true"
                     :auto-destroy="true">
                 <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
-                    <img :src="banner" alt="">
+                    <a :href="banner.url ? banner.url : 'javascript:;'">
+                        <img @click="handleShowContent(banner)" :src="banner.img" alt="">
+                    </a>
                 </swiper-slide>
                 <div v-if="topBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
             </swiper>
         </div>
 
-        <div class="swiper-scroll-container" v-if="footerBanner.length">
-            <swiper class="swiper-scroll" :options="swiperScrollOption">
-                <swiper-slide v-for="(item, index) in footerBanner" :key="index">
-                    <img :src="item" alt="">
-                </swiper-slide>
-            </swiper>
+        <div class="page-thumb">
+            <a v-for="(item, index) in footerBanner"
+               :key="index"
+               :href="item.url ? item.url : 'javascript:;'">
+                <img @click="handleShowContent(item)" :src="item.img" alt="">
+            </a>
         </div>
 
-        <div class="scan-qrcode-container">
-            <div class="scan-qrcode-img">
-                <img src="@/assets/images/icon-index-scan.png" alt="">
-            </div>
-            <div class="scan-qrcode-btn">
-                <button class="btn btn-plain" @click="_loadWechatSign">扫码充电</button>
-            </div>
-        </div>
+<!--        <div class="swiper-scroll-container" v-if="footerBanner.length">-->
+<!--            <swiper class="swiper-scroll" :options="swiperScrollOption">-->
+<!--                <swiper-slide v-for="(item, index) in footerBanner" :key="index">-->
+<!--                    <a :href="item.url ? item.url : 'javascript:;'">-->
+<!--                        <img :src="item.img" alt="">-->
+<!--                    </a>-->
+<!--                </swiper-slide>-->
+<!--            </swiper>-->
+<!--        </div>-->
+
+<!--        <div class="scan-qrcode-container">-->
+<!--            <div class="scan-qrcode-img">-->
+<!--                <img src="@/assets/images/icon-index-scan.png" alt="">-->
+<!--            </div>-->
+<!--            <div class="scan-qrcode-btn">-->
+<!--                <button class="btn btn-plain" @click="_loadWechatSign">扫码充电</button>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </template>
 
@@ -97,8 +109,23 @@
                         case 200: {
                             let top = res.data.top_banner || []
                             let footer = res.data.footer_banner || []
-                            this.topBanner = top.length ? top[0].banner : []
-                            this.footerBanner = footer.length ? footer[0].banner : []
+                            let topbanner = top.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || '',
+                                    content: v.content || ''
+                                }
+                            })
+                            let footerbanner = footer.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || '',
+                                    content: v.content || ''
+                                }
+                            })
+
+                            this.topBanner = topbanner.length ? topbanner : []
+                            this.footerBanner = footerbanner.length ? footerbanner : []
                             break;
                         }
                         case 401: {
@@ -199,6 +226,14 @@
                         .replace(/\+/g, ' ') +
                     '"}'
                 );
+            },
+            handleShowContent(item) {
+                if (item.content) {
+                    sessionStorage.setItem('BLANK_PAGE_CONTENT', item.content)
+                    this.$router.push({
+                        path: '/blank-page'
+                    })
+                }
             }
         }
     };
@@ -267,6 +302,16 @@
                     color: $button-primary-color;
                 }
             }
+        }
+    }
+
+    .page-thumb {
+        a {
+            display: block;
+            margin: 0.5rem 0;
+        }
+        img {
+            width: 100%;
         }
     }
 </style>

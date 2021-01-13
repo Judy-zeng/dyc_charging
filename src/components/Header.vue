@@ -1,6 +1,6 @@
 <template>
     <div class="page-header">
-        <span class="back-btn"  @click="back"></span>
+        <span class="back-btn" @click="back"></span>
         <span class="header-text">{{$route.meta.title}}</span>
         <span class="header-opt">
             <slot></slot>

@@ -13,6 +13,7 @@ import BalanceRecharge from "@/pages/BalanceRecharge";
 import BillRecord from "@/pages/BillRecord";
 import ChargeRecord from "@/pages/ChargeRecord";
 import DeviceRepair from "@/pages/DeviceRepair";
+import MiddlePage from "@/pages/MiddlePage";
 
 Vue.use(Router)
 
@@ -33,6 +34,11 @@ const routes = [
                 component: Person
             }
         ]
+    },
+    {
+        path: '/blank-page',
+        name: 'blank-page',
+        component: MiddlePage
     },
     {
         path: '/charge-timing',

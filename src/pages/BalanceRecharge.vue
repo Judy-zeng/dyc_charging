@@ -8,7 +8,9 @@
                         :auto-update="true"
                         :auto-destroy="true">
                     <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
-                        <img :src="banner" alt="">
+                        <a :href="banner.url ? banner.url : 'javascript:;'">
+                            <img :src="banner.img" alt="">
+                        </a>
                     </swiper-slide>
                     <div v-if="topBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
                 </swiper>
@@ -97,7 +99,13 @@
                             this.balance = res.data.money
                             this.list = res.data.list
                             let top = res.data.top_banner || []
-                            this.topBanner = top.length ? top[0].banner : []
+                            let topbanner = top.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || ''
+                                }
+                            })
+                            this.topBanner = topbanner.length ? topbanner : []
                             break;
                         }
                         default:

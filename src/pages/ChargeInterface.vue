@@ -8,13 +8,13 @@
                         :auto-update="true"
                         :auto-destroy="true">
                     <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
-                        <img :src="banner" alt="">
+                        <a :href="banner.url ? banner.url : 'javascript:;'">
+                            <img :src="banner.img" alt="">
+                        </a>
                     </swiper-slide>
+                    <div v-if="topBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
                 </swiper>
             </div>
-            <!--            <div class="banner-container">-->
-            <!--                <img src="@/assets/images/index-banner.png" alt="">-->
-            <!--            </div>-->
 
             <div class="charge-money-container">
                 <div class="money">
@@ -32,6 +32,7 @@
                     <span class="status">
                         <span class="status-item free"><i></i>空闲</span>
                         <span class="status-item used"><i></i>使用中</span>
+                        <span class="status-item offline"><i></i>离线</span>
                         <span class="status-item error"><i></i>故障</span>
                     </span>
                 </div>
@@ -46,8 +47,9 @@
                              alt="">
                         <template v-else>
                             <img v-if="item.status === 0" src="@/assets/images/icon-charge-interface-free.png" alt="">
-                            <img v-if="item.status === 1" src="@/assets/images/icon-charge-interface-use.png" alt="">
-                            <img v-if="item.status === 2" src="@/assets/images/icon-charge-interface-error.png" alt="">
+                            <img v-if="item.status === 1" src="@/assets/images/icon-charge-interface-error.png" alt="">
+                            <img v-if="item.status === 2" src="@/assets/images/icon-charge-interface-offline.png" alt="">
+                            <img v-if="item.status === 3" src="@/assets/images/icon-charge-interface-use.png" alt="">
                         </template>
                         <p>{{item.port > 9 ? item.port : '0' + item.port}}</p>
                     </div>
@@ -60,7 +62,9 @@
                             :auto-update="true"
                             :auto-destroy="true">
                         <swiper-slide class="swiper-slide" v-for="(banner, index) in footerBanner" :key="index">
-                            <img :src="banner" alt="">
+                            <a :href="banner.url ? banner.url : 'javascript:;'">
+                                <img :src="banner.img" alt="">
+                            </a>
                         </swiper-slide>
                         <div v-if="footerBanner.length > 1" class="swiper-pagination" slot="pagination"></div>
                     </swiper>
@@ -98,8 +102,8 @@
         props: {},
         data() {
             return {
-                currentInterface: 0,
-                currentStatus: 0,
+                currentInterface: '',
+                currentStatus: '',
                 totalMoney: 0, // 余额
                 list: [], // 0空闲 1使用中 2故障
                 swiperOptions: {
@@ -137,14 +141,29 @@
                         case 200: {
                             let top = res.data.top_banner || []
                             let footer = res.data.footer_banner || []
-                            this.topBanner = top.length ? top[0].banner : []
-                            this.footerBanner = footer.length ? footer[0].banner : []
+
+                            let topbanner = top.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || ''
+                                }
+                            })
+                            let footerbanner = footer.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || ''
+                                }
+                            })
+
+                            this.topBanner = topbanner.length ? topbanner : []
+                            this.footerBanner = footerbanner.length ? footerbanner : []
 
                             this.list = res.data.ports || []
 
                             for (let i = 0; i < this.list.length; i++) {
                                 if (this.list[i].status === 0) {
                                     this.currentInterface = i;
+                                    this.currentStatus = 0
                                     break;
                                 }
                             }
@@ -360,13 +379,19 @@
 
                         &.used {
                             i {
-                                background-color: #AFAFAF;
+                                background-color: #FF9E05;
                             }
                         }
 
                         &.error {
                             i {
-                                background-color: #FF9E05;
+                                background-color: #FF0000;
+                            }
+                        }
+
+                        &.offline {
+                            i {
+                                background-color: #AFAFAF;
                             }
                         }
                     }

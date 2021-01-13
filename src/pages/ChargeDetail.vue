@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <c-header path="/index">
+        <c-header :path="rebackPath">
             <button @click="handleDeviceRepair">设备报修</button>
         </c-header>
         <div class="page-content">
@@ -47,6 +47,7 @@
         data() {
             return {
                 chargeStatus: 0, // 0充电中 1已结束
+                rebackPath: '/index',
                 list: [
                     {title: '订单编号', field: 'order_no', order_no: ''},
                     {title: '用户编号', field: 'member_no', member_no: ''},
@@ -65,6 +66,9 @@
         created() {
             if (this.$route.query.order_no) {
                 this._loadData()
+                if (this.$route.query.path) {
+                    this.rebackPath = this.$route.query.path
+                }
             } else {
                 alert('订单号缺失')
             }

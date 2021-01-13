@@ -8,8 +8,11 @@
                         :auto-update="true"
                         :auto-destroy="true">
                     <swiper-slide class="swiper-slide" v-for="(banner, index) in topBanner" :key="index">
-                        <img :src="banner" alt="">
+                        <a :href="banner.url ? banner.url : 'javascript:;'">
+                            <img :src="banner.img" alt="">
+                        </a>
                     </swiper-slide>
+                    <div v-if="topBanner.length > 1" class="timing-swiper-pagination" slot="pagination"></div>
                 </swiper>
             </div>
             <div class="charge-timing-container">
@@ -35,8 +38,11 @@
                         :auto-update="true"
                         :auto-destroy="true">
                     <swiper-slide class="swiper-slide" v-for="(banner, index) in footerBanner" :key="index">
-                        <img :src="banner" alt="">
+                        <a :href="banner.url ? banner.url : 'javascript:;'">
+                            <img :src="banner.img" alt="">
+                        </a>
                     </swiper-slide>
+                    <div v-if="footerBanner.length > 1" class="timing-swiper-pagination" slot="pagination"></div>
                 </swiper>
             </div>
 
@@ -116,8 +122,21 @@
                         case 200: {
                             let top = res.data.top_banner || []
                             let footer = res.data.footer_banner || []
-                            this.topBanner = top.length ? top[0].banner : []
-                            this.footerBanner = footer.length ? footer[0].banner : []
+                            let topbanner = top.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || ''
+                                }
+                            })
+                            let footerbanner = footer.map(v => {
+                                return {
+                                    img: v.banner[0] || '',
+                                    url: v.url || ''
+                                }
+                            })
+
+                            this.topBanner = topbanner.length ? topbanner : []
+                            this.footerBanner = footerbanner.length ? footerbanner : []
 
                             this.list = res.data.time_package || []
                             this.currentList = this.list.length ? this.list[0] : {}

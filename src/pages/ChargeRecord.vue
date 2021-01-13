@@ -1,6 +1,6 @@
 <template>
     <div class="page-container">
-        <c-header></c-header>
+        <c-header path="/person"></c-header>
         <div class="page-content">
             <charge-cell v-for="(item, index) in list" :item="item" :key="index"></charge-cell>
         </div>
@@ -38,6 +38,9 @@
                 chargeRecord().then(res => {
                     switch (res.status_code) {
                         case 200: {
+                            // this.list = [
+                            //     {name: 'test', order_no: '20210113161054285551711', status: '充电中', charge_time: '', money: 3}
+                            // ]
                             this.list = res.data
                             break;
                         }

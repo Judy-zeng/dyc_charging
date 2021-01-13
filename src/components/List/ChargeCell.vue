@@ -1,5 +1,5 @@
 <template>
-    <div class="record-cell">
+    <div class="record-cell" @click="handleGoDetail">
         <div class="cell-title">
             <img src="@/assets/images/icon-charge-detail.png" alt="">
             <span class="title">{{item.name}}</span>
@@ -39,7 +39,16 @@
         },
         mounted() {
         },
-        methods: {}
+        methods: {
+            handleGoDetail() {
+                this.$router.push({
+                    path: '/charge-detail?order_no=' + this.item.order_no,
+                    query: {
+                        path: '/charge-record'
+                    }
+                })
+            }
+        }
     };
 </script>
 
