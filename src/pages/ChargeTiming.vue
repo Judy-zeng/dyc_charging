@@ -18,7 +18,7 @@
             <div class="charge-timing-container">
                 <div class="header">
                     <span class="title">选择充电时长（分钟）</span>
-                    <span class="money">{{currentList.money}}元</span>
+<!--                    <span class="money">{{currentList.money}}元</span>-->
                 </div>
 
                 <div class="charge-timing-box">
@@ -27,7 +27,8 @@
                          :class="{active: currentList.minutes === item.minutes}"
                          v-for="item in list"
                          :key="item.time">
-                        {{item.minutes}}
+                        <div>{{item.minutes}}</div>
+                        <div class="item-money">¥ <span>{{Number(item.money).toFixed(2)}}</span></div>
                     </div>
                 </div>
             </div>
@@ -172,16 +173,24 @@
         .top-banner-swiper {
             height: 7.5rem;
             background-color: #E3E3E3;
-            border-bottom: solid 0.25rem #E3E3E3;
+            border-bottom: solid 0.25rem #F2F2F2;
             box-sizing: border-box;
         }
 
         .charge-timing-container {
-            padding: 0.6rem 0.5rem;
+            /*padding: 0.6rem 0.5rem;*/
+            background-color: #F2F2F2;
 
             .header {
                 display: flex;
+                align-items: center;
                 justify-content: space-between;
+                background-color: #fff;
+                height: 2.5rem;
+                padding: 0 0.5rem;
+                border-bottom: solid 0.25rem #F2F2F2;
+                box-sizing: border-box;
+                margin-bottom: 0.2rem;
 
                 .title, .money {
                     font-size: 0.7rem;
@@ -195,26 +204,42 @@
             }
 
             .charge-timing-box {
-                display: grid;
-                grid-gap: 0.9rem 3.1rem;
-                grid-template-columns: repeat(3, 1fr);
-                margin: 0.9rem 0 0.5rem 0;
+                /*display: grid;*/
+                /*grid-gap: 0.9rem 3.1rem;*/
+                /*grid-template-columns: repeat(3, 1fr);*/
+                /*margin: 0.9rem 0 0.5rem 0;*/
+                margin: 0 0.4rem;
+                padding-bottom: 0.25rem;
 
                 .box-item {
-                    border: solid 1px rgba(83, 83, 83, 0.6);
+                    background-color: #fff;
+                    border: solid 2px transparent;
+                    /*border: solid 1px rgba(83, 83, 83, 0.6);*/
                     box-sizing: border-box;
-                    border-radius: 0.3rem;
+                    border-radius: 0.4rem;
                     text-align: center;
                     color: #3F3F3F;
-                    height: 2rem;
-                    line-height: 2rem;
+                    height: 2.2rem;
+                    line-height: 2.2rem;
                     font-size: 0.9rem;
                     transition: background-color 0.3s;
+                    margin-bottom: 0.5rem;
+                    padding: 0 0.5rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    .item-money {
+                        color: #D14C57;
+                        font-size: 0.6rem;
+                        font-weight: bold;
+                        span {
+                            font-size: 0.9rem;
+                        }
+                    }
 
                     &.active {
-                        background-color: $theme-color;
-                        color: #fff;
-                        border: solid 1px $theme-color;
+                        color: #333;
+                        border: solid 2px #EED0A5;
                         box-sizing: border-box;
                     }
                 }

@@ -76,6 +76,8 @@
             </div>
         </div>
         <popup ref="payPopup" @on-change="handlePayMode"></popup>
+
+        <c-white-pay ref="whitePayModal" @confirmPhone="handleConfirmPhone"/>
     </div>
 </template>
 
@@ -85,10 +87,11 @@
 
     import Popup from "@/components/Popup";
     import Header from "@/components/Header";
+    import WhitePayModal from "@/components/WhitePayModal";
     import wx from "weixin-js-sdk";
 
     import {interfaceList, orderPay, paySuccess} from "@/network/api";
-    import {getParams} from "@/network/utils";
+    import {getParams, setParams} from "@/network/utils";
 
     export default {
         name: 'ChargeInterface',
@@ -96,7 +99,8 @@
             swiper,
             swiperSlide,
             Popup,
-            'c-header': Header
+            'c-header': Header,
+            'c-white-pay': WhitePayModal
         },
         filters: {},
         props: {},
@@ -120,15 +124,31 @@
                 topBanner: [],
                 footerBanner: [],
                 payModeList: [
-                    {id: 1, name: '微信支付'},
-                    {id: 2, name: '钱包支付'}
-                ]
+                    {id: 3, name: '中国银行免密支付'},
+                    {id: 2, name: '账户余额支付'},
+                    {id: 1, name: '微信支付'}
+                ],
+                hasPhone: false
             };
         },
         computed: {},
         watch: {},
         created() {
             this._loadData()
+            if (this.$route.query.openid) {
+                let _params = getParams()
+                let params = {
+                    device_number: _params.code,
+                    consume_type: 2, // 充电付款
+                    pay_type: 3,
+                    money: _params.money,
+                    port: _params.port,
+                    charge_time: _params.time,
+                    openid: this.$route.query.openid,
+                    phone: ''
+                }
+                this.confirmPayOrder(params)
+            }
         },
         mounted() {
         },
@@ -164,11 +184,27 @@
                                 if (this.list[i].status === 0) {
                                     this.currentInterface = i;
                                     this.currentStatus = 0
+                                    setParams({port: this.list[i].port})
                                     break;
                                 }
                             }
 
                             this.totalMoney = res.data.money
+                            this.hasPhone = res.data.phone ? true : false;
+                            if (res.data.ip_pay == 1) {
+                                this.payModeList = [
+                                    {id: 3, name: '中国银行免密支付'},
+                                    {id: 2, name: '账户余额支付'},
+                                    {id: 1, name: '微信支付'},
+                                    {id: 4, name: '白名单支付'}
+                                ]
+                            } else {
+                                this.payModeList = [
+                                    {id: 3, name: '中国银行免密支付'},
+                                    {id: 2, name: '账户余额支付'},
+                                    {id: 1, name: '微信支付'}
+                                ]
+                            }
                             break;
                         }
                         case 401: {
@@ -187,9 +223,10 @@
             handleSelectInterface(item, index) {
                 this.currentInterface = index
                 this.currentStatus = item.status
+                setParams({port: item.port})
             },
             handleShowPay() {
-                this.$refs.payPopup.showModal(this.payModeList)
+                this.$refs.payPopup.showModal(this.payModeList, this.isWhiteList)
             },
             // 发起支付
             handlePayMode(item) {
@@ -201,10 +238,24 @@
                     pay_type: item.id,
                     money: _params.money,
                     port: _port.port,
-                    charge_time: _params.time
+                    charge_time: _params.time,
+                    openid: '',
+                    phone: ''
+                }
+                if (item.id == 2 && +this.totalMoney < +_params.money) {
+                    alert('余额不足')
+                    return
+                }
+                if (item.id == 4 && !this.hasPhone) {
+                    this.$refs.whitePayModal.showModal(params)
+                    return
                 }
                 this.confirmPayOrder(params)
                 // this.$router.push('/charge-detail')
+            },
+
+            handleConfirmPhone(params) {
+                this.confirmPayOrder(params)
             },
             // 去充值
             handleGoPay() {
@@ -249,11 +300,20 @@
                         case 200: {
                             if (data.pay_type === 1) { // 微信支付
                                 this.getWxConfigSign(res.data)
-                            } else {
+                            } else if (data.pay_type === 2 || data.pay_type === 4) { // 余额/白名单
                                 this.$router.push('/charge-detail?order_no=' +res.data.order_no)
+                            } else { // 中行
+                                if (res.data.url) {
+                                    this.goToUrl(res.data.url,'post', {})
+                                } else if (res.data.order_no) {
+                                    this.$router.push('/charge-detail?order_no=' +res.data.order_no)
+                                }
                             }
                             break;
                         }
+                        case 400:
+                            alert(res.message)
+                            break;
                         default:
                             alert(res.status_code + ':' + res.message)
                     }
@@ -272,6 +332,16 @@
                 }).catch(e => {
                     alert(e.message)
                 })
+            },
+
+            goToUrl(url, method, params) {
+                var form = document.createElement("form");
+                form.action = url;
+                form.method = method;
+                form.style.display = "none";
+                document.body.appendChild(form);
+                form.submit();
+                return form;
             }
         }
     };
@@ -391,7 +461,7 @@
 
                         &.offline {
                             i {
-                                background-color: #AFAFAF;
+                                background-color: #9D9D9D;
                             }
                         }
                     }

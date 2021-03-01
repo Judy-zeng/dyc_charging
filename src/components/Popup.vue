@@ -2,6 +2,7 @@
     <div>
         <transition :name="`popup-animate-bottom`">
             <div v-show="isShow" class="popup-dialog"
+                 :style="{height: list.length === 4 ? '13rem' : '11rem'}"
                  :class="[`popup-bottom`, isShow ? 'popup-show' : '']">
                 <div class="popup-content">
                     <div class="popup-item"
@@ -63,7 +64,7 @@
         left: 0;
         bottom: 0;
         width: 100%;
-        height: 7.8rem;
+        height: 11rem;
         z-index: 501;
         transition-property: transform;
         transition-duration: 300ms;

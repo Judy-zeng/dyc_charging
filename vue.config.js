@@ -9,8 +9,8 @@ module.exports = {
         },
         proxy: {
             '/api': {
-                target: 'http://tcharge.loverain.top',
-                // target: 'http://120.55.83.24:666',
+                // target: 'http://tcharge.loverain.top',
+                target: 'http://120.55.83.24:666',
                 changeOrigin: true
             }
         }

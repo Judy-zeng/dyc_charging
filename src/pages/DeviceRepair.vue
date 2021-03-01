@@ -19,6 +19,7 @@
                         <div class="label">报修人</div>
                         <input v-model="formData.name" class="input" type="text" placeholder="请输入报修人">
                     </div>
+
                     <div class="form-item">
                         <div class="label">联系方式</div>
                         <input v-model="formData.phone"
@@ -27,6 +28,7 @@
                                type="text"
                                placeholder="请输入联系方式">
                     </div>
+
                     <div class="form-item online">
                         <div class="label">故障原因</div>
                         <div class="input">
