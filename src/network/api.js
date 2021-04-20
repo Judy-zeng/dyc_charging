@@ -80,3 +80,8 @@ export const billRecord = (params) => service.get('/api/bill/record', {params})
  * 微信签名
  */
 export const wechatSign = (params) => service.get(`/api/wechat/sign?${params}`)
+
+/**
+ * 权限验证
+ */
+export const authPay = (params) => service.get('/api/member/phone', { params })

@@ -15,6 +15,7 @@ module.exports = {
             }
         }
     },
+    lintOnSave: false,
     runtimeCompiler: true,
     chainWebpack: config => {
         const oneOfsMap = config.module.rule('scss').oneOfs.store

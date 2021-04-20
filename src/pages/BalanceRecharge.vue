@@ -48,6 +48,7 @@
     import Header from "@/components/Header";
     import {balanceCharge, orderPay, paySuccess} from "@/network/api";
     import {swiper, swiperSlide} from "vue-awesome-swiper";
+    import {getParams} from "@/network/utils";
     import wx from "weixin-js-sdk";
 
     export default {
@@ -122,11 +123,22 @@
             },
             handleConfirmCharge() {
                 let item = this.list[this.currentIndex]
-                let params = {
-                    consume_type: 1, // 会员充值
-                    pay_type: 1,
-                    money: item.money,
-                    giving_money: item.giving_money
+                let _params = getParams()
+                let params = {}
+                if (_params.phoneNumber) { // app内打开
+                    params = {
+                        consume_type: 1, // 会员充值
+                        pay_type: 3,
+                        money: item.money,
+                        giving_money: item.giving_money
+                    }
+                } else {
+                    params = {
+                        consume_type: 1, // 会员充值
+                        pay_type: 1,
+                        money: item.money,
+                        giving_money: item.giving_money
+                    }
                 }
                 this.confirmPayOrder(params)
                 // this.$router.push('/index')
@@ -136,7 +148,12 @@
                 orderPay(data).then(res => {
                     switch (res.status_code) {
                         case 200: {
-                            this.getWxConfigSign(res.data)
+                            if (data.pay_type == 3) {
+                                this._loadData()
+                                alert('充值成功')
+                            } else {
+                                this.getWxConfigSign(res.data)
+                            }
                             break;
                         }
                         default:

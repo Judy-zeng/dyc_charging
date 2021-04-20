@@ -195,15 +195,19 @@
                                 this.payModeList = [
                                     {id: 3, name: '中国银行免密支付'},
                                     {id: 2, name: '账户余额支付'},
-                                    {id: 1, name: '微信支付'},
-                                    {id: 4, name: '白名单支付'}
+                                    {id: 4, name: '白名单支付'},
+                                    // {id: 1, name: '微信支付'},
                                 ]
                             } else {
                                 this.payModeList = [
                                     {id: 3, name: '中国银行免密支付'},
                                     {id: 2, name: '账户余额支付'},
-                                    {id: 1, name: '微信支付'}
+                                    // {id: 1, name: '微信支付'}
                                 ]
+                            }
+
+                            if (!params.phoneNumber) { // 非app内打开
+                                this.payModeList.push({id: 1, name: '微信支付'})
                             }
                             break;
                         }
@@ -226,7 +230,7 @@
                 setParams({port: item.port})
             },
             handleShowPay() {
-                this.$refs.payPopup.showModal(this.payModeList, this.isWhiteList)
+                this.$refs.payPopup.showModal(this.payModeList)
             },
             // 发起支付
             handlePayMode(item) {

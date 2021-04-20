@@ -51,6 +51,8 @@
                 <button class="charge-btn" @click="handleNextStep">下一步</button>
             </div>
         </div>
+
+        <c-auth-pay ref="authPayModal" @confirmPhone="handleConfirmPhone"/>
     </div>
 </template>
 
@@ -58,15 +60,18 @@
     import {swiper, swiperSlide} from 'vue-awesome-swiper'
     import 'swiper/dist/css/swiper.css'
     import Header from "@/components/Header";
+    import AuthPayModal from "@/components/AuthPayModal";
     import {timingList} from "@/network/api";
     import {getParams, setParams, setType} from "@/network/utils";
+    import {PalauAPI} from '../network/palau-jsbridge-4.1.0'
 
     export default {
         name: 'ChargeTiming',
         components: {
             'c-header': Header,
             swiper,
-            swiperSlide
+            swiperSlide,
+            'c-auth-pay': AuthPayModal
         },
         filters: {},
         props: {},
@@ -87,7 +92,8 @@
                         delay: 2500,
                         disableOnInteraction: false
                     }
-                }
+                },
+                hasPhone: false
             };
         },
         computed: {},
@@ -108,6 +114,22 @@
                     code = params.code
                     setParams({type: 0})
                 }
+
+                let appPhone = ''
+                try {
+                    if (PalauAPI.user && PalauAPI.user.userInfo()) {
+                        let info = PalauAPI.user.userInfo()
+                        appPhone = info.phoneNumber
+                        setParams({phoneNumber: info.phoneNumber})
+                    } else {
+                        setParams({phoneNumber: ''})
+                        appPhone = ''
+                    }
+                } catch (e) {
+                    console.log(e)
+                    setParams({phoneNumber: ''})
+                    appPhone = ''
+                }
                 // if (!params.code) {
                 //     code = this.$route.query.device_number || ''
                 //     if (code) {
@@ -118,7 +140,10 @@
                 //     code = params.code
                 // }
                 this.$loading('数据加载中')
-                timingList({device_number: code}).then(res => {
+                timingList({
+                    device_number: code,
+                    app_phone: appPhone
+                }).then(res => {
                     switch (res.status_code) {
                         case 200: {
                             let top = res.data.top_banner || []
@@ -142,6 +167,7 @@
                             this.list = res.data.time_package || []
                             this.currentList = this.list.length ? this.list[0] : {}
                             setParams({time: this.currentList.minutes, money: this.currentList.money})
+                            this.hasPhone = res.data.ip_pay_two === 1 && !res.data.phone ? true : false;
                             break;
                         }
                         case 401: {
@@ -162,8 +188,15 @@
                 setParams({time: item.minutes, money: item.money})
             },
             handleNextStep() {
+                if (this.hasPhone) {
+                    this.$refs.authPayModal.showModal()
+                } else {
+                    this.$router.push('/charge-interface')
+                }
+            },
+            handleConfirmPhone(mobile) {
                 this.$router.push('/charge-interface')
-            }
+            },
         }
     };
 </script>
