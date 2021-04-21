@@ -63,7 +63,6 @@
     import AuthPayModal from "@/components/AuthPayModal";
     import {timingList} from "@/network/api";
     import {getParams, setParams, setType} from "@/network/utils";
-    import {PalauAPI} from '../network/palau-jsbridge-4.1.0'
 
     export default {
         name: 'ChargeTiming',
@@ -117,8 +116,14 @@
 
                 let appPhone = ''
                 try {
-                    if (PalauAPI.user && PalauAPI.user.userInfo()) {
-                        let info = PalauAPI.user.userInfo()
+                    if (window.PalauAPI.user && window.PalauAPI.user.userInfo()) {
+                        let info = window.PalauAPI.user.userInfo()
+                        if (!info.phoneNumber) {
+                            window.PalauAPI.user.login(() => {
+                                window.location.reload()
+                            })
+                            return;
+                        }
                         appPhone = info.phoneNumber
                         setParams({phoneNumber: info.phoneNumber})
                     } else {

@@ -2,7 +2,7 @@
 
 var PalauAPI = {};
 var SZJSBridge;
-(function(){  
+(function(){
   var uniqueId = 1;
   var responseCallbacks = {};
   var isIOS;
@@ -234,7 +234,7 @@ var SZJSBridge;
   /**
    * 设置conf
    * 活动、问吧中有调用
-   * @param {Object} conf 
+   * @param {Object} conf
    */
   PalauAPI.setConfig = function(conf) {
     config = _extend(true, {}, config, conf);
@@ -672,8 +672,8 @@ var SZJSBridge;
      */
     uploadImages: function (maxNumber, responseCallback) {
       var callbackId = 'palau_' + (uniqueId++) + '_' + new Date().getTime();
-      responseCallbacks[callbackId] = responseCallback; 
-      if (!isIOS) {  
+      responseCallbacks[callbackId] = responseCallback;
+      if (!isIOS) {
         SZJSBridge.uploadImages(maxNumber, callbackId);
       } else {
         window.webkit.messageHandlers.uploadImages.postMessage({
@@ -711,7 +711,7 @@ var SZJSBridge;
 
     /**
      * 获取userAgent
-     * 
+     *
      * @memberof browser
      * @function userAgent
      * @returns {String} userAgent
@@ -724,7 +724,7 @@ var SZJSBridge;
 
     /**
      * 环境检测
-     * 
+     *
      * @memberof browser
      * @function browserEnv
      * @returns {String} 浏览器环境 （wechat, qq, weibo, mobild, windows, mac）
@@ -765,7 +765,7 @@ var SZJSBridge;
    *  //@todo
    * };
    * PalauAPI.pay(paySN, cb);
-   * 
+   *
    */
   PalauAPI.pay = function () {
     var count = arguments.length;
@@ -824,7 +824,7 @@ var SZJSBridge;
    * @param {string}  type      baidu/gaode
    * @param {string}  address   地址
    * @param {string}  lng       经度
-   * @param {string}  lat       纬度 
+   * @param {string}  lat       纬度
    * @example
    * PalauAPI.navigate('baidu', '', '116', '39');
    */

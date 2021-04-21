@@ -148,14 +148,21 @@
                 orderPay(data).then(res => {
                     switch (res.status_code) {
                         case 200: {
-                            if (data.pay_type == 3) {
-                                this._loadData()
-                                alert('充值成功')
+                            if (data.pay_type === 3) { // 中行支付
+                                if (res.data.url) {
+                                    this.goToUrl(res.data.url,'post', {})
+                                } else {
+                                    this._loadData()
+                                    alert('充值成功')
+                                }
                             } else {
                                 this.getWxConfigSign(res.data)
                             }
                             break;
                         }
+                        case 400:
+                            alert(res.message)
+                            break;
                         default:
                             alert(res.status_code + ':' + res.message)
                     }
@@ -210,6 +217,15 @@
                 }).catch(e => {
                     alert(e.message)
                 })
+            },
+            goToUrl(url, method, params) {
+                var form = document.createElement("form");
+                form.action = url;
+                form.method = method;
+                form.style.display = "none";
+                document.body.appendChild(form);
+                form.submit();
+                return form;
             }
         }
     };
